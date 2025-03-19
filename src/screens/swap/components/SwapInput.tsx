@@ -4,14 +4,16 @@ import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 
 function SwapInput({
-  disabled,
   amount,
   handleAmount,
   token,
   tokens,
   title,
+  type,
   handleToken,
   usdPrice,
+  tokenSearch,
+  handleTokenSearch,
 }: any) {
   const [showModal, setShowModal] = useState(false);
   return (
@@ -22,7 +24,7 @@ function SwapInput({
           type="text"
           placeholder="0"
           value={amount}
-          disabled={disabled}
+          disabled={type == "buy"}
           onChange={(e) => handleAmount(e.target.value)}
           className="w-1/2 text-3xl font-medium bg-transparent focus:outline-none"
         />
@@ -58,11 +60,21 @@ function SwapInput({
         </span>
         {token && (
           <span className="text-[#d4ff00]">
-            0 {token?.symbol} <span className="text-sm text-gray-400">Max</span>
+            0 {token?.symbol}{" "}
+            {type == "sell" && (
+              <span
+                onClick={() => {}}
+                className="text-sm text-gray-400 cursor-pointer hover:text-white"
+              >
+                Max
+              </span>
+            )}
           </span>
         )}
       </div>
       <SelectTokenModal
+        tokenSearch={tokenSearch}
+        handleTokenSearch={handleTokenSearch}
         tokens={tokens}
         showModal={showModal}
         setShowModal={setShowModal}

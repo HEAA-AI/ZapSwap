@@ -25,6 +25,7 @@ export default function SwapPage() {
   const { setShowModal, connected } = useSolanaWallet();
   const [sellAmount, setSellAmount] = useState("0");
   const [buyAmount, setBuyAmount] = useState("0");
+  const [tokenSearch, setTokenSearch] = useState("");
   const [sellCurrency, setSellCurrency] = useState<Token | null>(null);
   const [buyCurrency, setBuyCurrency] = useState<Token | null>(null);
   const { tokens }: any = JUPITER_SWAPPER.getTokenList({});
@@ -51,17 +52,17 @@ export default function SwapPage() {
   useEffect(() => {
     if (order?.data?.outAmount) {
       setBuyAmount(
-        formatUnits(order?.data?.outAmount, sellCurrency?.decimals).toString()
+        formatUnits(order?.data?.outAmount, buyCurrency?.decimals).toString()
       );
     }
   }, [order]);
 
-  console.log(order?.data);
   const tokensList = useMemo(() => {
     if (!tokens?.data?.tokens) {
       return [];
     }
-    return tokens?.data?.tokens?.map((token) => ({
+
+    const allTokens = tokens.data.tokens.map((token: any) => ({
       address: token?.address,
       decimals: token?.decimals,
       name: token?.name,
@@ -69,7 +70,27 @@ export default function SwapPage() {
       symbol: token?.symbol,
       tags: token?.tags,
     }));
-  }, [tokens]);
+
+    if (!tokenSearch) {
+      return allTokens.filter(
+        (token) =>
+          token.address !== sellCurrency?.address &&
+          token.address !== buyCurrency?.address
+      );
+    }
+
+    return allTokens
+      .filter(
+        (token: any) =>
+          token.name.toLowerCase().includes(tokenSearch.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(tokenSearch.toLowerCase())
+      )
+      .filter(
+        (token: any) =>
+          token.address !== sellCurrency?.address &&
+          token.address !== buyCurrency?.address
+      );
+  }, [tokens, tokenSearch, sellCurrency, buyCurrency]);
 
   const buttonText = useMemo(() => {
     if (!connected) {
@@ -92,26 +113,31 @@ export default function SwapPage() {
         <div className="w-full max-w-md">
           <SwapInput
             title="Sell"
+            type="sell"
             amount={sellAmount}
             handleAmount={setSellAmount}
             token={sellCurrency}
             tokens={tokensList}
             handleToken={setSellCurrency}
             usdPrice={tokensPriceUsd?.sellAmount}
+            tokenSearch={tokenSearch}
+            handleTokenSearch={setTokenSearch}
           />
           <ArrowDivider />
           <SwapInput
             title="Buy"
+            type="buy"
             amount={buyAmount}
             token={buyCurrency}
             handleAmount={setBuyAmount}
             tokens={tokensList}
             handleToken={setBuyCurrency}
             usdPrice={tokensPriceUsd?.buyAmount}
-            disabled={true}
+            tokenSearch={tokenSearch}
+            handleTokenSearch={setTokenSearch}
           />
 
-          <SlippageInfo />
+          <SlippageInfo slippage={order?.data?.slippageBps} />
 
           <Button
             onClick={() => {
@@ -121,9 +147,9 @@ export default function SwapPage() {
             }}
             className={cn(
               "w-full font-minecraft bg-[#d4ff00] hover:bg-[#c2ee00] text-black font-bold rounded-full py-6 mt-4",
-              !sellCurrency &&
-                !buyCurrency &&
-                "hover:bg-primary text-white bg-[#111] border border-[#d4ff00]/10 "
+              (!sellCurrency || !buyCurrency) &&
+                "hover:bg-primary text-white bg-[#111] border border-[#d4ff00]/10 ",
+              !connected && "bg-[#d4ff00] hover:bg-[#c2ee00] text-black"
             )}
           >
             {buttonText}

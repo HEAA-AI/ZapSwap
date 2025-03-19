@@ -14,16 +14,29 @@ const SelectTokenModal = ({
   setShowModal,
   tokens,
   handleToken,
+  tokenSearch,
+  handleTokenSearch,
 }: any) => {
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>
-      <DialogContent className="bg-[#111] pb-0  border-2 min-w-[400px] px-5  max-w-[400px]  border-[#646464]  font-minecraft ">
+      <DialogContent className="bg-[#111] pb-0  border-2 min-w-[400px]  px-5  max-w-[400px]  border-[#646464]  font-minecraft ">
         <DialogHeader className="">
           <DialogTitle className="mb-2 text-white ">Select a token</DialogTitle>
           <DialogDescription>
-            <InputSearch />
-            <div className="flex pb-5 flex-col max-h-[400px] overflow-y-scroll">
-              {tokens?.map((token, index: number) => (
+            <InputSearch
+              tokenSearch={tokenSearch}
+              handleTokenSearch={handleTokenSearch}
+            />
+            <div
+              className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
+              overflow-y-scroll h-full  max-h-[400px]`}
+            >
+              {!tokens?.length && (
+                <div className="flex items-center justify-center py-10">
+                  Token not found
+                </div>
+              )}
+              {tokens?.map((token: any, index: number) => (
                 <TokenListItem
                   handleToken={() => {
                     handleToken(token);
@@ -58,13 +71,17 @@ const TokenListItem = ({ token, handleToken }: any) => {
   );
 };
 
-const InputSearch = () => {
+const InputSearch = ({ tokenSearch, handleTokenSearch }: any) => {
   return (
     <div className="p-2 px-5 bg-[#1C1C1C] rounded-full mb-2">
       <div className="flex items-center ">
         <Search size={18} />
         <Input
-          className="border-none focus-visible:ring-0"
+          onChange={(e) => {
+            handleTokenSearch(e.target.value);
+          }}
+          value={tokenSearch}
+          className="text-white border-none focus-visible:ring-0"
           placeholder="Search tokens"
         />
       </div>
