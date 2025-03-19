@@ -11,36 +11,35 @@ import { useSolanaWallet } from "@/provider/WalletProvider";
 import { cn } from "@/lib/utils";
 import { JUPITER_SWAPPER } from "@/services/api/jupiter";
 import { formatUnits, parseUnits } from "ethers";
-
-interface Token {
-  address: string;
-  decimals: number;
-  name: string;
-  img: string;
-  symbol: string;
-  tags?: string[]; // Optional, assuming it's an array of strings
-}
+import { Token } from "@/types/type";
 
 export default function SwapPage() {
-  const { setShowModal, connected } = useSolanaWallet();
-  const [sellAmount, setSellAmount] = useState("0");
-  const [buyAmount, setBuyAmount] = useState("0");
-  const [tokenSearch, setTokenSearch] = useState("");
-  const [sellCurrency, setSellCurrency] = useState<Token | null>(null);
-  const [buyCurrency, setBuyCurrency] = useState<Token | null>(null);
-  const { tokens }: any = JUPITER_SWAPPER.getTokenList({});
-  const { pairPrice }: any = JUPITER_SWAPPER.getPairPrice({
+  const { setShowModal, connected } = useSolanaWallet(); // Wallet connection state
+  const [sellAmount, setSellAmount] = useState<string>("0"); // Amount to sell
+  const [buyAmount, setBuyAmount] = useState<string>("0"); // Amount to receive
+  const [tokenSearch, setTokenSearch] = useState<string>(""); // Token search input
+  const [sellCurrency, setSellCurrency] = useState<Token | null>(null); // Selected token to sell
+  const [buyCurrency, setBuyCurrency] = useState<Token | null>(null); // Selected token to buy
+
+  // Fetch available tokens
+  const { tokens }: { tokens: any } = JUPITER_SWAPPER.getTokenList({});
+
+  // Fetch price of selected pair
+  const { pairPrice }: { pairPrice: any } = JUPITER_SWAPPER.getPairPrice({
     listAddress: `${sellCurrency?.address},${buyCurrency?.address}`,
   });
 
+  // Compute token prices in USD
   const tokensPriceUsd = useMemo(() => {
     return {
-      sellAmount: pairPrice?.data?.prices?.[sellCurrency?.address] ?? 0,
-      buyAmount: pairPrice?.data?.prices?.[buyCurrency?.address] ?? 0,
+      sellAmount:
+        pairPrice?.data?.prices?.[sellCurrency?.address as string] ?? 0,
+      buyAmount: pairPrice?.data?.prices?.[buyCurrency?.address as string] ?? 0,
     };
-  }, [pairPrice]);
+  }, [pairPrice, sellCurrency, buyCurrency]);
 
-  const { order }: any = JUPITER_SWAPPER.getOrderInfo({
+  // Fetch order info for swap
+  const { order }: { order: any } = JUPITER_SWAPPER.getOrderInfo({
     inputMint: sellCurrency?.address,
     amount: parseUnits(
       sellAmount ? sellAmount : "0",
@@ -49,20 +48,21 @@ export default function SwapPage() {
     outputMint: buyCurrency?.address,
   });
 
+  // Update buy amount when order info changes
   useEffect(() => {
     if (order?.data?.outAmount) {
       setBuyAmount(
         formatUnits(order?.data?.outAmount, buyCurrency?.decimals).toString()
       );
     }
-  }, [order]);
+  }, [order, buyCurrency]);
 
+  // Generate filtered token list based on search input and selected tokens
   const tokensList = useMemo(() => {
-    if (!tokens?.data?.tokens) {
-      return [];
-    }
+    if (!tokens?.data?.tokens) return [];
 
-    const allTokens = tokens.data.tokens.map((token: any) => ({
+    // Map tokens into desired format
+    const allTokens: Token[] = tokens.data.tokens.map((token: any) => ({
       address: token?.address,
       decimals: token?.decimals,
       name: token?.name,
@@ -71,6 +71,7 @@ export default function SwapPage() {
       tags: token?.tags,
     }));
 
+    // Filter out selected sell and buy tokens
     if (!tokenSearch) {
       return allTokens.filter(
         (token) =>
@@ -81,28 +82,26 @@ export default function SwapPage() {
 
     return allTokens
       .filter(
-        (token: any) =>
+        (token: Token) =>
           token.name.toLowerCase().includes(tokenSearch.toLowerCase()) ||
-          token.symbol.toLowerCase().includes(tokenSearch.toLowerCase())
+          token.symbol.toLowerCase().includes(tokenSearch.toLowerCase()) ||
+          token.address.toLowerCase().includes(tokenSearch.toLowerCase())
       )
       .filter(
-        (token: any) =>
+        (token: Token) =>
           token.address !== sellCurrency?.address &&
           token.address !== buyCurrency?.address
       );
   }, [tokens, tokenSearch, sellCurrency, buyCurrency]);
 
+  // Determine button text based on wallet and selection status
   const buttonText = useMemo(() => {
-    if (!connected) {
-      return "Connect Wallet";
-    }
-    if (!sellCurrency || !buyCurrency) {
-      return "Select Token";
-    }
+    if (!connected) return "Connect Wallet";
+    if (!sellCurrency || !buyCurrency) return "Select Token";
     return "Swap Token";
   }, [sellCurrency, buyCurrency, connected]);
 
-  // bg-gradient-to-b from-black to-[#1a1a00]
+  //
   return (
     <div className="relative flex flex-col min-h-screen text-white bg-black">
       <Header />
