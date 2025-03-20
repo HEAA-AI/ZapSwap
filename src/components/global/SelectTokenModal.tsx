@@ -59,13 +59,22 @@ const TokenListItem = ({ token, handleToken }: any) => {
     <div
       onClick={handleToken}
       className={cn(
-        `flex items-center w-full p-2.5   space-x-3 transition-all border rounded-xl cursor-pointer hover:bg-[#1C1C1C] border-none hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl`
+        `flex group items-center w-full p-2.5    transition-all border rounded-xl cursor-pointer border-transparent hover:bg-[#1C1C1C] hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl hover:border-[#d4ff00]/50`
       )}
     >
-      <img src={token?.img} className="w-10 h-10 rounded-full" />
+      <div className="flex items-center flex-1 space-x-3 ">
+        <img src={token?.img} className="w-10 h-10 rounded-full" />
+        <div>
+          <div className="text-white text-md">{token?.name}</div>
+          <div className="text-xs text-white/50">{token?.symbol}</div>
+        </div>
+      </div>
       <div>
-        <div className="text-white text-md">{token?.name}</div>
-        <div className="text-xs text-white/50">{token?.symbol}</div>
+        {token?.balance > 0 && (
+          <div className=" font-minecraft text-[10px] group-hover:text-[#d4ff00] ">
+            {`${Number(token?.balance).toLocaleString()} ${token?.symbol}`}
+          </div>
+        )}
       </div>
     </div>
   );

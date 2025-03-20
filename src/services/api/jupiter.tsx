@@ -4,20 +4,29 @@ import { JUPITER_API } from "../../utility/constant";
 
 class JupiterSwapper {
   constructor() {}
-  getSwapQuote = () => {
+  getSwapQuote = ({
+    inputMint,
+    outputMint,
+    amount,
+    slippageBps,
+    restrictIntermediateTokens,
+    platformFeeBps,
+  }: any) => {
     const {
       data: swapQuote,
       isPending: swapQuoteLoading,
-      mutateAsync: swapQuoteMutateAsync,
-    } = useMutation({
-      mutationFn: async ({
+      refetch: swapQuoteRefetch,
+    } = useQuery({
+      queryKey: [
+        "swapQuote",
         inputMint,
         outputMint,
         amount,
         slippageBps,
         restrictIntermediateTokens,
         platformFeeBps,
-      }: any) => {
+      ],
+      queryFn: async () => {
         return await fetcher({
           url: `${JUPITER_API}/quote`,
           isBaseUrl: false,
@@ -36,7 +45,7 @@ class JupiterSwapper {
     return {
       swapQuote,
       swapQuoteLoading,
-      swapQuoteMutateAsync,
+      swapQuoteRefetch,
     };
   };
 
@@ -90,40 +99,21 @@ class JupiterSwapper {
     };
   };
 
-  getOrderInfo = ({ inputMint, amount, outputMint }: any) => {
-    const {
-      data: order,
-      isPending: orderLoading,
-      refetch: orderRefetch,
-    } = useQuery({
-      queryKey: ["getOrderInfo", inputMint, amount, outputMint],
-      queryFn: async () => {
-        return await fetcher({
-          url: `https://ultra-api.jup.ag/order`,
-          isBaseUrl: false,
-          method: "GET",
-          params: {
-            inputMint,
-            amount,
-            outputMint,
-          },
-        });
-      },
-    });
-    return {
-      order,
-      orderLoading,
-      orderRefetch,
-    };
-  };
-
   swap = () => {
     const {
       data: swap,
       isPending: swapLoading,
       mutateAsync: swapMutateAsync,
     } = useMutation({
-      mutationFn: async ({ quoteResponse, userPublicKey, feeAccount }: any) => {
+      mutationFn: async ({
+        quoteResponse,
+        userPublicKey,
+        feeAccount,
+      }: {
+        quoteResponse: any;
+        userPublicKey: string;
+        feeAccount: string;
+      }) => {
         return await fetcher({
           url: `${JUPITER_API}/swap`,
           isBaseUrl: false,
@@ -132,7 +122,7 @@ class JupiterSwapper {
             quoteResponse,
             userPublicKey,
             feeAccount,
-
+            wrapAndUnwrapSol: true,
             // ADDITIONAL PARAMETERS TO OPTIMIZE FOR TRANSACTION LANDING
             // See next guide to optimize for transaction landing
             dynamicComputeUnitLimit: true,

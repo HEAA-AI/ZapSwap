@@ -5,10 +5,9 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { clusterApiUrl } from "@solana/web3.js";
 import { useCallback, useMemo, ReactNode } from "react";
 import SolanaWalletProvider from "./WalletProvider";
+import { SOLANA_RPC_URL } from "@/utility/constant";
 
 interface SolanaProviderProps {
   children: ReactNode;
@@ -16,13 +15,13 @@ interface SolanaProviderProps {
 
 function SolanaProvider({ children }: SolanaProviderProps) {
   // Define the Solana RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl("mainnet-beta"), []);
+  const endpoint = useMemo(() => SOLANA_RPC_URL, []);
 
   // Initialize the wallet adapter
   const wallets = useMemo(
     () => [
       new SolflareWalletAdapter({
-        network: WalletAdapterNetwork.Mainnet,
+        // network: WalletAdapterNetwork.Mainnet,
       }),
     ],
     []
@@ -37,7 +36,9 @@ function SolanaProvider({ children }: SolanaProviderProps) {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
         <WalletModalProvider>
-          <SolanaWalletProvider>{children}</SolanaWalletProvider>
+          <SolanaWalletProvider endpoint={endpoint}>
+            {children}
+          </SolanaWalletProvider>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

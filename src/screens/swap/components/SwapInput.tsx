@@ -1,5 +1,6 @@
 import SelectTokenModal from "@/components/global/SelectTokenModal";
 import { Button } from "@/components/ui/button";
+import { handleDecimalCount } from "@/utility/formatHandler";
 import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -16,6 +17,7 @@ function SwapInput({
   handleTokenSearch,
 }: any) {
   const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
       <div className="mb-2 text-sm text-gray-400">{title}</div>
@@ -25,7 +27,16 @@ function SwapInput({
           placeholder="0"
           value={amount}
           disabled={type == "buy"}
-          onChange={(e) => handleAmount(e.target.value)}
+          onChange={(e) => {
+            const value = handleDecimalCount(e.target.value);
+            handleAmount(value); // Only update state if input is valid
+          }}
+          onPaste={(e) => {
+            e.preventDefault(); // Prevent default paste behavior
+            const pastedValue = e.clipboardData.getData("text");
+            const validValue = handleDecimalCount(pastedValue);
+            handleAmount(validValue);
+          }}
           className="w-1/2 text-3xl font-medium bg-transparent focus:outline-none"
         />
         <div className="flex items-center gap-2">
@@ -60,10 +71,12 @@ function SwapInput({
         </span>
         {token && (
           <span className="text-[#d4ff00]">
-            0 {token?.symbol}{" "}
+            {token?.balance} {token?.symbol}{" "}
             {type == "sell" && (
               <span
-                onClick={() => {}}
+                onClick={() => {
+                  handleAmount(String(token?.balance));
+                }}
                 className="text-sm text-gray-400 cursor-pointer hover:text-white"
               >
                 Max
