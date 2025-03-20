@@ -32,9 +32,9 @@ const WalletsConnectModal = () => {
 
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>
-      <DialogContent className="bg-[#111] border-2 min-w-[400px]  max-w-[400px]  border-[#646464]  font-minecraft ">
+      <DialogContent className="bg-[#000000] border-2 min-w-[400px]  max-w-[400px]  border-[#272727]  font-minecraft ">
         <DialogHeader className="">
-          <DialogTitle className="mb-2 text-white ">
+          <DialogTitle className="mb-4 text-white ">
             Connect a wallet
           </DialogTitle>
           <DialogDescription>
@@ -63,7 +63,7 @@ const WalletListItem = ({ wallet, handleClick }: any) => {
     <div
       onClick={handleClick}
       className={cn(
-        `flex items-center w-full px-5 py-4 space-x-5 transition-all border rounded-lg cursor-pointer bg-[#1C1C1C] border-none hover:border hover:border-primary hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl`
+        `flex items-center w-full px-5 py-4 space-x-3 transition-all border rounded-lg cursor-pointer bg-[#111111] border-none hover:border hover:border-primary hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl`
       )}
     >
       <img src={wallet?.icon} className="w-10 h-10" />

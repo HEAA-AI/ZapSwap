@@ -8,43 +8,26 @@ import {
 } from "../ui/dialog";
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
+import { TokenBalanceInfo } from "@/types/type";
 
-const SelectTokenModal = ({
-  showModal,
-  setShowModal,
-  tokens,
-  handleToken,
-  tokenSearch,
-  handleTokenSearch,
-}: any) => {
+const MyTokenListModal = ({ tokenBalances, showModal, setShowModal }: any) => {
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>
       <DialogContent className="bg-[#000000] pb-0  border-2 min-w-[400px]  px-5  max-w-[400px]  border-[#272727]  font-minecraft ">
         <DialogHeader className="">
-          <DialogTitle className="mb-4 text-white ">Select a token</DialogTitle>
+          <DialogTitle className="mb-4 text-white ">My Tokens</DialogTitle>
           <DialogDescription>
-            <InputSearch
-              tokenSearch={tokenSearch}
-              handleTokenSearch={handleTokenSearch}
-            />
             <div
               className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
               overflow-y-scroll h-full  max-h-[400px]`}
             >
-              {!tokens?.length && (
+              {!tokenBalances?.length && (
                 <div className="flex items-center justify-center py-10">
-                  Token not found
+                  Tokens not found
                 </div>
               )}
-              {tokens?.map((token: any, index: number) => (
-                <TokenListItem
-                  handleToken={() => {
-                    handleToken(token);
-                    setShowModal(false);
-                  }}
-                  token={token}
-                  key={index}
-                />
+              {tokenBalances?.map((token: TokenBalanceInfo, index: number) => (
+                <TokenListItem token={token} key={index} />
               ))}
             </div>
           </DialogDescription>
@@ -54,19 +37,19 @@ const SelectTokenModal = ({
   );
 };
 
-const TokenListItem = ({ token, handleToken }: any) => {
+const TokenListItem = ({ token }: any) => {
   return (
     <div
-      onClick={handleToken}
       className={cn(
         `flex group items-center w-full p-2.5    transition-all border rounded-xl cursor-pointer border-transparent hover:bg-[#111111] hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl hover:border-[#d4ff00]/50`
       )}
     >
       <div className="flex items-center flex-1 space-x-3 ">
-        <img src={token?.img} className="w-10 h-10 rounded-full" />
         <div>
-          <div className="text-white text-md">{token?.name}</div>
-          <div className="text-xs text-white/50">{token?.symbol}</div>
+          <div className="text-white text-md">{token?.symbol}</div>
+          <div className="text-xs text-white/50">
+            {`${token?.mint?.slice(0, 6)}...${token?.mint?.slice(-6)}`}
+          </div>
         </div>
       </div>
       <div>
@@ -97,4 +80,5 @@ const InputSearch = ({ tokenSearch, handleTokenSearch }: any) => {
     </div>
   );
 };
-export default SelectTokenModal;
+
+export default MyTokenListModal;

@@ -44,7 +44,7 @@ function SwapInput({
             <Button
               onClick={() => setShowModal(true)}
               variant="outline"
-              className="rounded-full border-gray-700 bg-[#222] hover:bg-[#333] hover:text-white flex items-center gap-2"
+              className="rounded-full px-2 border-gray-700 bg-[#111111] hover:bg-[#272727] hover:text-white flex items-center gap-2"
             >
               <img
                 className="flex items-center justify-center w-6 h-6 text-xs bg-blue-500 rounded-full"
