@@ -13,7 +13,10 @@ import useNetworkWallet from "./useNetworkWallet";
 import {
   AddressLookupTableAccount,
   PublicKey,
+  sendAndConfirmRawTransaction,
   Transaction,
+  TransactionInstruction,
+  TransactionMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
 import { useAppSelector } from "@/store/hooks";
@@ -201,6 +204,107 @@ function useSwapHook() {
   //   }
   // }
 
+  // async function signAndSendTransaction() {
+  //   if (!connected || !signTransaction || !sendTransaction || !publicKey) {
+  //     console.error(
+  //       "Wallet is not connected or does not support signing transactions"
+  //     );
+  //     return;
+  //   }
+
+  //   // IMPORTANT: This is incorrect - outputTokenMint should be the mint address of the token
+  //   // NOT your wallet address. This is a critical mistake.
+  //   // const outputTokenMint = new PublicKey(ADMIN_FEE_ACCOUNT); // WRONG!
+
+  //   // Use the actual mint address of the output token (e.g., USDC mint)
+  //   const outputTokenMint = new PublicKey(swapQuote?.data?.outputMint); // USDC mint address as example
+
+  //   // Your fee wallet address
+  //   const feeWallet = new PublicKey(ADMIN_FEE_ACCOUNT);
+
+  //   // Derive the ATA for this token and your fee wallet
+  //   const feeATA = await getAssociatedTokenAddress(
+  //     outputTokenMint, // token mint address
+  //     feeWallet // owner wallet
+  //   );
+
+  //   // Check if the ATA exists
+  //   const ataInfo = await connection.getAccountInfo(feeATA);
+
+  //   // If ATA doesn't exist, create it first
+  //   if (!ataInfo) {
+  //     console.log("Creating ATA for fee collection...");
+  //     const createAtaIx = createAssociatedTokenAccountInstruction(
+  //       publicKey, // payer
+  //       feeATA, // ata address
+  //       feeWallet, // owner
+  //       outputTokenMint // token mint
+  //     );
+
+  //     const createAtaTx = new Transaction().add(createAtaIx);
+  //     const createAtaSig = await sendTransaction(createAtaTx, connection);
+  //     console.log("Created ATA:", createAtaSig);
+
+  //     // Wait for confirmation
+  //     await connection.confirmTransaction(createAtaSig);
+  //   }
+
+  //   // Now use the fee ATA address in the swap request
+  //   const swapTransaction: any = await swapMutateAsync({
+  //     quoteResponse: swapQuote?.data,
+  //     // Use the derived ATA address, not the wallet address
+  //     feeAccount: feeATA.toString(),
+  //     userPublicKey: publicKey.toString(),
+  //   });
+
+  //   try {
+  //     const transactionBase64 = swapTransaction?.data?.swapTransaction;
+  //     const transaction = VersionedTransaction.deserialize(
+  // new Uint8Array(
+  //   atob(transactionBase64)
+  //     .split("")
+  //     .map((char) => char.charCodeAt(0))
+  //       )
+  //     );
+
+  //     const addressLookupTableAccounts = await Promise.all(
+  //       transaction.message.addressTableLookups.map(async (lookup) => {
+  //         return new AddressLookupTableAccount({
+  //           key: lookup.accountKey,
+  //           state: AddressLookupTableAccount.deserialize(
+  //             await connection
+  //               .getAccountInfo(lookup.accountKey)
+  //               .then((res) => res.data)
+  //           ),
+  //         });
+  //       })
+  //     );
+
+  //     const signedTransaction = await signTransaction(transaction);
+
+  //     const rawTransaction = signedTransaction.serialize();
+  //     const txid = await connection.sendRawTransaction(rawTransaction, {
+  //       skipPreflight: true,
+  //       maxRetries: 2,
+  //     });
+
+  //     const latestBlockHash = await connection.getLatestBlockhash();
+  //     await connection.confirmTransaction(
+  //       {
+  //         blockhash: latestBlockHash.blockhash,
+  //         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+  //         signature: txid,
+  //       },
+  //       "confirmed"
+  //     );
+
+  //     console.log("Transaction confirmed:", txid);
+  //     return txid;
+  //   } catch (error) {
+  //     console.error("Error signing or sending the transaction:", error);
+  //   }
+  // }
+
   async function signAndSendTransaction() {
     if (!connected || !signTransaction || !sendTransaction || !publicKey) {
       console.error(
@@ -209,61 +313,48 @@ function useSwapHook() {
       return;
     }
 
-    // IMPORTANT: This is incorrect - outputTokenMint should be the mint address of the token
-    // NOT your wallet address. This is a critical mistake.
-    // const outputTokenMint = new PublicKey(ADMIN_FEE_ACCOUNT); // WRONG!
-
-    // Use the actual mint address of the output token (e.g., USDC mint)
-    const outputTokenMint = new PublicKey(swapQuote?.data?.outputMint); // USDC mint address as example
-
-    // Your fee wallet address
-    const feeWallet = new PublicKey(ADMIN_FEE_ACCOUNT);
-
-    // Derive the ATA for this token and your fee wallet
-    const feeATA = await getAssociatedTokenAddress(
-      outputTokenMint, // token mint address
-      feeWallet // owner wallet
-    );
-
-    // Check if the ATA exists
-    const ataInfo = await connection.getAccountInfo(feeATA);
-
-    // If ATA doesn't exist, create it first
-    if (!ataInfo) {
-      console.log("Creating ATA for fee collection...");
-      const createAtaIx = createAssociatedTokenAccountInstruction(
-        publicKey, // payer
-        feeATA, // ata address
-        feeWallet, // owner
-        outputTokenMint // token mint
-      );
-
-      const createAtaTx = new Transaction().add(createAtaIx);
-      const createAtaSig = await sendTransaction(createAtaTx, connection);
-      console.log("Created ATA:", createAtaSig);
-
-      // Wait for confirmation
-      await connection.confirmTransaction(createAtaSig);
-    }
-
-    // Now use the fee ATA address in the swap request
-    const swapTransaction: any = await swapMutateAsync({
-      quoteResponse: swapQuote?.data,
-      // Use the derived ATA address, not the wallet address
-      feeAccount: feeATA.toString(),
-      userPublicKey: publicKey.toString(),
-    });
-
     try {
-      const transactionBase64 = swapTransaction?.data?.swapTransaction;
-      const transaction = VersionedTransaction.deserialize(
-        new Uint8Array(
-          atob(transactionBase64)
-            .split("")
-            .map((char) => char.charCodeAt(0))
-        )
+      const blockhash = await connection.getRecentBlockhash("finalized");
+
+      const outputTokenMint = new PublicKey(swapQuote?.data?.outputMint);
+      const feeWallet = new PublicKey(ADMIN_FEE_ACCOUNT);
+      const feeATA = await getAssociatedTokenAddress(
+        outputTokenMint,
+        feeWallet
+      );
+      const ataInfo = await connection.getAccountInfo(feeATA);
+      const instructions: TransactionInstruction[] = [];
+
+      // Perform ATA creation FIRST if it does not exist
+      if (!ataInfo) {
+        console.log("Creating ATA for fee collection...");
+        const createAtaIx = createAssociatedTokenAccountInstruction(
+          publicKey, // Fee payer (user)
+          feeATA, // New ATA address
+          feeWallet, // Owner of the ATA
+          outputTokenMint // Token mint address
+        );
+        instructions.push(createAtaIx);
+      }
+
+      // Now execute the swap transaction
+      console.log("Executing swap transaction...");
+      const swapTransaction: any = await swapMutateAsync({
+        quoteResponse: swapQuote?.data,
+        feeAccount: feeATA.toString(), // Use the created ATA
+        userPublicKey: publicKey.toString(),
+      });
+
+      // Deserialize Jupiter swap transaction
+      const swapTransactionBuf = new Uint8Array(
+        atob(swapTransaction?.data?.swapTransaction)
+          .split("")
+          .map((char) => char.charCodeAt(0))
       );
 
+      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+
+      // Fetch Address Lookup Table accounts
       const addressLookupTableAccounts = await Promise.all(
         transaction.message.addressTableLookups.map(async (lookup) => {
           return new AddressLookupTableAccount({
@@ -277,26 +368,26 @@ function useSwapHook() {
         })
       );
 
-      const signedTransaction = await signTransaction(transaction);
-
-      const rawTransaction = signedTransaction.serialize();
-      const txid = await connection.sendRawTransaction(rawTransaction, {
-        skipPreflight: true,
-        maxRetries: 2,
+      // Decompile the Jupiter transaction
+      const message = TransactionMessage.decompile(transaction.message, {
+        addressLookupTableAccounts: addressLookupTableAccounts,
       });
 
-      const latestBlockHash = await connection.getLatestBlockhash();
-      await connection.confirmTransaction(
-        {
-          blockhash: latestBlockHash.blockhash,
-          lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-          signature: txid,
-        },
-        "confirmed"
+      // Add the ATA creation instruction FIRST (if needed)
+      instructions.forEach((ix) => message.instructions.unshift(ix));
+
+      // Compile everything into a single Versioned Transaction
+      transaction.message = message.compileToV0Message(
+        addressLookupTableAccounts
       );
 
-      console.log("Transaction confirmed:", txid);
-      return txid;
+      // Sign and send the combined transaction
+      const signedTransaction = await signTransaction(transaction);
+      const txid = await sendTransaction(signedTransaction, connection, {
+        skipPreflight: true,
+        preflightCommitment: "confirmed",
+      });
+      console.log(`Swap Transaction Successful: https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error("Error signing or sending the transaction:", error);
     }
