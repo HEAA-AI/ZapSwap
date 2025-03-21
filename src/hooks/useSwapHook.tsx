@@ -7,6 +7,7 @@ import _ from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useNetworkWallet from "./useNetworkWallet";
 import { VersionedTransaction } from "@solana/web3.js";
+import { useAppSelector } from "@/store/hooks";
 
 function useSwapHook() {
   const [sellAmount, setSellAmount] = useState<string>(""); // Amount to sell
@@ -15,15 +16,18 @@ function useSwapHook() {
   const [sellCurrency, setSellCurrency] = useState<Token | null>(null); // Selected token to sell
   const [buyCurrency, setBuyCurrency] = useState<Token | null>(null); // Selected token to buy
   const { tokenBalances } = useNetworkWallet();
+  const { slippageValue, manualSwapEnabled } = useAppSelector(
+    (state) => state.global
+  );
   const { connected, signTransaction, publicKey, connection } =
     useSolanaWallet(); // Wallet connection
   const { swapMutateAsync } = JUPITER_SWAPPER.swap();
-  const { tokens }: { tokens: any } = JUPITER_SWAPPER.getTokenList({
+  const { tokens }: any = JUPITER_SWAPPER.getTokenList({
     query: tokenSearch,
   });
 
   // Fetch price of selected pair
-  const { pairPrice }: { pairPrice: any } = JUPITER_SWAPPER.getPairPrice({
+  const { pairPrice, pairPriceLoading }: any = JUPITER_SWAPPER.getPairPrice({
     listAddress: `${sellCurrency?.address},${buyCurrency?.address}`,
   });
 
@@ -38,12 +42,13 @@ function useSwapHook() {
 
   // Fetch order info for swap
   const { swapQuote, swapQuoteRefetch }: any = JUPITER_SWAPPER.getSwapQuote({
-    inputMint: sellCurrency?.address,
+    inputMint: sellCurrency?.address as string,
     amount: sellAmount
       ? parseUnits(sellAmount, sellCurrency?.decimals).toString()
       : "",
-    outputMint: buyCurrency?.address,
-    platformFee: SWAP_PLATFORM_FEE,
+    outputMint: buyCurrency?.address as string,
+    platformFeeBps: SWAP_PLATFORM_FEE,
+    slippageBps: slippageValue ? Number(slippageValue) * 100 : "50",
   });
 
   useEffect(() => {
@@ -60,7 +65,7 @@ function useSwapHook() {
   const debounceQuoteCall = useCallback(_.debounce(swapQuoteRefetch, 500), []);
   useEffect(() => {
     debounceQuoteCall(sellAmount);
-  }, [sellAmount, debounceQuoteCall]);
+  }, [sellAmount, debounceQuoteCall, slippageValue, manualSwapEnabled]);
 
   // Generate filtered token list based on search input and selected tokens
   const tokensList = useMemo(() => {
@@ -168,6 +173,7 @@ function useSwapHook() {
     setBuyCurrency,
     signAndSendTransaction,
     tokenBalances,
+    pairPriceLoading,
   };
 }
 

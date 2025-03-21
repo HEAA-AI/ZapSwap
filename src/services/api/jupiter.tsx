@@ -11,7 +11,14 @@ class JupiterSwapper {
     slippageBps,
     restrictIntermediateTokens,
     platformFeeBps,
-  }: any) => {
+  }: {
+    inputMint: string;
+    outputMint: string;
+    amount: string;
+    slippageBps?: string | number;
+    restrictIntermediateTokens?: string;
+    platformFeeBps?: string | number;
+  }) => {
     const {
       data: swapQuote,
       isPending: swapQuoteLoading,
@@ -49,7 +56,33 @@ class JupiterSwapper {
     };
   };
 
-  getTokenList = ({ query = "" }: any) => {
+  getMyAccountInfo = ({ address }: { address?: string }) => {
+    const {
+      data: accountInfo,
+      isPending: accountInfoLoading,
+      refetch: accountInfoRefetch,
+    } = useQuery({
+      queryKey: ["accountInfo", address],
+      queryFn: async () => {
+        return await fetcher({
+          url: `https://portfolio-api-jup-pos.sonar.watch/v1/portfolio/fetchJup`,
+          isBaseUrl: false,
+          method: "GET",
+          params: {
+            address,
+            addressSystem: "solana",
+          },
+        });
+      },
+    });
+    return {
+      accountInfo,
+      accountInfoLoading,
+      accountInfoRefetch,
+    };
+  };
+
+  getTokenList = ({ query = "" }: { query?: string }) => {
     const {
       data: tokens,
       isPending: tokensLoading,
@@ -74,7 +107,7 @@ class JupiterSwapper {
     };
   };
 
-  getPairPrice = ({ listAddress = "" }: any) => {
+  getPairPrice = ({ listAddress = "" }: { listAddress?: string }) => {
     const {
       data: pairPrice,
       isPending: pairPriceLoading,

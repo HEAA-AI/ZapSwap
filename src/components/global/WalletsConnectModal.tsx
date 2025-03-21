@@ -10,10 +10,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { toast } from "sonner";
 
 const WalletsConnectModal = () => {
   const { wallets, showModal, setShowModal, select } = useSolanaWallet();
 
+  //
   const filteredAdapters = wallets?.reduce(
     (acc: any, wallet: Wallet) => {
       const adapterName = wallet?.adapter?.name;
@@ -25,9 +27,16 @@ const WalletsConnectModal = () => {
     { installed: [] }
   );
 
-  const onClickWallet = useCallback((wallet: WalletAdapter) => {
-    select(wallet?.name);
-    setShowModal(false);
+  const onClickWallet = useCallback(async (wallet: WalletAdapter) => {
+    try {
+      select(wallet?.name);
+      toast.success("Wallet connected successfully.", {
+        description: "Your wallet has been connected securely.",
+      });
+      setShowModal(false);
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   return (
@@ -43,7 +52,7 @@ const WalletsConnectModal = () => {
                 (wallet: WalletAdapter, index: number) => (
                   <WalletListItem
                     handleClick={() => onClickWallet(wallet)}
-                    wallet={wallet}
+                    walletAdapter={wallet}
                     key={index}
                   />
                 )
@@ -56,8 +65,14 @@ const WalletsConnectModal = () => {
   );
 };
 
-const WalletListItem = ({ wallet, handleClick }: any) => {
-  const adapterName = wallet?.name;
+const WalletListItem = ({
+  walletAdapter,
+  handleClick,
+}: {
+  walletAdapter: WalletAdapter;
+  handleClick: () => void;
+}) => {
+  const adapterName = walletAdapter?.name;
 
   return (
     <div
@@ -66,7 +81,10 @@ const WalletListItem = ({ wallet, handleClick }: any) => {
         `flex items-center w-full px-5 py-4 space-x-3 transition-all border rounded-lg cursor-pointer bg-[#111111] border-none hover:border hover:border-primary hover:bg-white/10 hover:backdrop-blur-xl hover:shadow-2xl`
       )}
     >
-      <img src={wallet?.icon} className="w-10 h-10" />
+      <img
+        src={walletAdapter?.icon}
+        className="w-10 h-10 border border-[#d4ff00]/50 rounded-full"
+      />
       <div className="text-white">{adapterName}</div>
     </div>
   );

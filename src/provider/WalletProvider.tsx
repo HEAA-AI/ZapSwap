@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
-import WalletsConnectModal from "@/components/global/WalletsConnectModal";
 import { Connection } from "@solana/web3.js";
 
 // Define the shape of the Solana Wallet Context
@@ -28,7 +27,6 @@ function SolanaWalletProvider({
     <SolanaWalletContext.Provider
       value={{ ...defaultWalletContext, showModal, setShowModal, connection }}
     >
-      <WalletsConnectModal />
       {children}
     </SolanaWalletContext.Provider>
   );

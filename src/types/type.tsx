@@ -12,4 +12,11 @@ export type TokenBalanceInfo = {
   balance: number;
   symbol: string;
   decimals: number;
+  img: string;
+  name: string;
+};
+
+export type ModalVisibilityType = {
+  showModal: boolean;
+  setShowModal: (value: boolean) => void;
 };

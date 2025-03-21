@@ -1,9 +1,24 @@
 import SelectTokenModal from "@/components/global/SelectTokenModal";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Token } from "@/types/type";
 import { handleDecimalCount } from "@/utility/formatHandler";
 import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 
+type Props = {
+  amount: string;
+  handleAmount: (value: string) => void;
+  title: string;
+  type: "buy" | "sell";
+  token: Token | null;
+  usdPrice: string;
+  tokenSearch: string;
+  tokens: Token[];
+  handleToken: (token: Token) => void;
+  handleTokenSearch: (search: string) => void;
+  loading?: boolean;
+};
 function SwapInput({
   amount,
   handleAmount,
@@ -15,30 +30,36 @@ function SwapInput({
   usdPrice,
   tokenSearch,
   handleTokenSearch,
-}: any) {
+  loading,
+}: Props) {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
       <div className="mb-2 text-sm text-gray-400">{title}</div>
       <div className="flex items-center justify-between">
-        <input
-          type="text"
-          placeholder="0"
-          value={amount}
-          disabled={type == "buy"}
-          onChange={(e) => {
-            const value = handleDecimalCount(e.target.value);
-            handleAmount(value); // Only update state if input is valid
-          }}
-          onPaste={(e) => {
-            e.preventDefault(); // Prevent default paste behavior
-            const pastedValue = e.clipboardData.getData("text");
-            const validValue = handleDecimalCount(pastedValue);
-            handleAmount(validValue);
-          }}
-          className="w-1/2 text-3xl font-medium bg-transparent focus:outline-none"
-        />
+        {loading ? (
+          <Skeleton className="w-[100px] h-[20px] rounded-full" />
+        ) : (
+          <input
+            type="text"
+            placeholder="0"
+            value={amount}
+            disabled={type == "buy"}
+            onChange={(e) => {
+              const value = handleDecimalCount(e.target.value);
+              handleAmount(value); // Only update state if input is valid
+            }}
+            onPaste={(e) => {
+              e.preventDefault(); // Prevent default paste behavior
+              const pastedValue = e.clipboardData.getData("text");
+              const validValue = handleDecimalCount(pastedValue);
+              handleAmount(validValue);
+            }}
+            className="w-1/2 text-3xl font-medium bg-transparent focus:outline-none"
+          />
+        )}
+
         <div className="flex items-center gap-2">
           {token ? (
             <Button
@@ -67,7 +88,11 @@ function SwapInput({
       </div>
       <div className="flex justify-between mt-2">
         <span className="text-gray-400">
-          ${Number(amount * usdPrice).toLocaleString()}
+          {loading ? (
+            <Skeleton className="w-[100px] h-[15px] rounded-full" />
+          ) : (
+            <>${Number(Number(amount) * Number(usdPrice)).toLocaleString()}</>
+          )}
         </span>
         {token && (
           <span className="text-[#d4ff00]">

@@ -28,6 +28,7 @@ export default function SwapPage() {
     setBuyCurrency,
     signAndSendTransaction,
     tokenBalances,
+    pairPriceLoading,
   } = useSwapHook();
   return (
     <div className="relative flex flex-col min-h-screen text-white bg-black">
@@ -61,6 +62,7 @@ export default function SwapPage() {
             usdPrice={tokensPriceUsd?.buyAmount}
             tokenSearch={tokenSearch}
             handleTokenSearch={setTokenSearch}
+            loading={pairPriceLoading}
           />
 
           <SlippageInfo slippage={swapQuote?.data?.slippageBps} />
