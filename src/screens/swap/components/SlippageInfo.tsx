@@ -31,7 +31,7 @@ function SlippageInfo({
         </div>
 
         <div className="flex items-center space-x-3">
-          <>{manualSwapEnabled ? <BotOff /> : <Bot />}</>
+          {/* <>{manualSwapEnabled ? <BotOff /> : <Bot />}</> */}
           <Button
             onClick={() => setShowModal(true)}
             variant="default"

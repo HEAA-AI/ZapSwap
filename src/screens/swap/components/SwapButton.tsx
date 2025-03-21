@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Button } from "@/components/ui/button"; // Ensure correct import path
 import { cn } from "@/lib/utils";
 import { Token, TokenBalanceInfo } from "@/types/type";
+import { LoaderCircle } from "lucide-react";
 // Utility function for conditional classNames
 
 type Props = {
@@ -10,6 +11,8 @@ type Props = {
   sellCurrency: Token | null;
   buyCurrency: Token | null;
   sellAmount: string;
+  loading?: boolean;
+  disabled?: boolean;
   tokenBalances: TokenBalanceInfo[];
 };
 const SwapButton = ({
@@ -19,6 +22,8 @@ const SwapButton = ({
   sellAmount,
   connected,
   tokenBalances,
+  loading = false,
+  disabled = false,
 }: Props) => {
   const { buttonText, extraClass } = useMemo(() => {
     const balance =
@@ -62,13 +67,20 @@ const SwapButton = ({
 
   return (
     <Button
+      disabled={disabled}
       onClick={onClick}
       className={cn(
         "w-full font-minecraft font-bold rounded-full py-6 mt-4 transition-all",
         extraClass
       )}
     >
-      {buttonText}
+      {loading ? (
+        <span className=" animate-spin">
+          <LoaderCircle />
+        </span>
+      ) : (
+        buttonText
+      )}
     </Button>
   );
 };

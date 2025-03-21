@@ -58,7 +58,7 @@ function SolanaProvider({ children }: SolanaProviderProps) {
                     "group toast group-[.toaster]:bg-[#111] group-[.toaster]:text-white group-[.toaster]:border-[#27272a] group-[.toaster]:shadow-lg",
                   description: "group-[.toast]:text-muted-foreground",
                   actionButton:
-                    "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+                    "group-[.toast]:bg-primary  group-[.toast]:text-primary-foreground",
                   cancelButton:
                     "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
                 },

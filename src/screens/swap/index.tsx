@@ -30,6 +30,8 @@ export default function SwapPage() {
     tokenBalances,
     pairPriceLoading,
     debounceQuoteCall,
+    swapLoading,
+    isSubmitting,
   } = useSwapHook();
   return (
     <div className="relative flex flex-col min-h-screen text-white bg-black">
@@ -77,6 +79,8 @@ export default function SwapPage() {
             sellAmount={sellAmount}
             tokenBalances={tokenBalances}
             connected={connected}
+            loading={swapLoading || isSubmitting}
+            disabled={swapLoading || isSubmitting}
             onClick={() => {
               if (!connected) {
                 setShowModal(true);
