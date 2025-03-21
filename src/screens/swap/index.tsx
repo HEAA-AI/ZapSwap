@@ -29,6 +29,7 @@ export default function SwapPage() {
     signAndSendTransaction,
     tokenBalances,
     pairPriceLoading,
+    debounceQuoteCall,
   } = useSwapHook();
   return (
     <div className="relative flex flex-col min-h-screen text-white bg-black">
@@ -65,7 +66,10 @@ export default function SwapPage() {
             loading={pairPriceLoading}
           />
 
-          <SlippageInfo slippage={swapQuote?.data?.slippageBps} />
+          <SlippageInfo
+            debounceQuoteCall={debounceQuoteCall}
+            slippage={swapQuote?.data?.slippageBps}
+          />
 
           <SwapButton
             sellCurrency={sellCurrency}

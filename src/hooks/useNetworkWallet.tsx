@@ -62,7 +62,7 @@ function useNetworkWallet() {
           element.data.assets.forEach((asset: any) => {
             const tokenInfo =
               apiData.tokenInfo[asset.networkId]?.[asset.data.address] || {};
-            console.log(asset.data.address);
+
             if (
               ["11111111111111111111111111111111"].includes(asset.data.address)
             ) {
@@ -85,8 +85,6 @@ function useNetworkWallet() {
       console.error("Error fetching balances:", error);
     }
   };
-
-  console.log(tokenBalances);
 
   useEffect(() => {
     if (connected) fetchBalances();

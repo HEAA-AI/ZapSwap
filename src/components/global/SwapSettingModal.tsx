@@ -59,7 +59,6 @@ const SwapSettingModal = ({
                 <Switch
                   checked={manualSwapEnabled}
                   onCheckedChange={(e) => {
-                    console.log(e);
                     if (!e) {
                       dispatch(setSlippageValue(""));
                     }

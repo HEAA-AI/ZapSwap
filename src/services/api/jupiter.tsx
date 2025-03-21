@@ -4,20 +4,23 @@ import { JUPITER_API } from "../../utility/constant";
 
 class JupiterSwapper {
   constructor() {}
+
   getSwapQuote = ({
     inputMint,
     outputMint,
     amount,
     slippageBps,
-    restrictIntermediateTokens,
+    restrictIntermediateTokens = true,
     platformFeeBps,
+    taker,
   }: {
     inputMint: string;
     outputMint: string;
     amount: string;
     slippageBps?: string | number;
-    restrictIntermediateTokens?: string;
-    platformFeeBps?: string | number;
+    restrictIntermediateTokens?: boolean;
+    platformFeeBps?: string | number | null;
+    taker: string;
   }) => {
     const {
       data: swapQuote,
@@ -32,8 +35,23 @@ class JupiterSwapper {
         slippageBps,
         restrictIntermediateTokens,
         platformFeeBps,
+        taker,
       ],
       queryFn: async () => {
+        console.log({
+          inputMint,
+          outputMint,
+          amount,
+          slippageBps,
+          restrictIntermediateTokens,
+          platformFeeBps,
+          onlyDirectRoutes: false,
+          asLegacyTransaction: false,
+          maxAccounts: 64,
+          computeAutoSlippage: true,
+          minimizeSlippage: false,
+          taker,
+        });
         return await fetcher({
           url: `${JUPITER_API}/quote`,
           isBaseUrl: false,
@@ -144,7 +162,7 @@ class JupiterSwapper {
         feeAccount,
       }: {
         quoteResponse: any;
-        userPublicKey: string;
+        userPublicKey: any;
         feeAccount: string;
       }) => {
         return await fetcher({
@@ -155,17 +173,18 @@ class JupiterSwapper {
             quoteResponse,
             userPublicKey,
             feeAccount,
-            wrapAndUnwrapSol: true,
+
+            // wrapAndUnwrapSol: true,
             // ADDITIONAL PARAMETERS TO OPTIMIZE FOR TRANSACTION LANDING
             // See next guide to optimize for transaction landing
-            dynamicComputeUnitLimit: true,
-            dynamicSlippage: true,
-            prioritizationFeeLamports: {
-              priorityLevelWithMaxLamports: {
-                maxLamports: 1000000,
-                priorityLevel: "veryHigh",
-              },
-            },
+            // dynamicComputeUnitLimit: true,
+            // dynamicSlippage: true,
+            // prioritizationFeeLamports: {
+            //   priorityLevelWithMaxLamports: {
+            //     maxLamports: 1000000,
+            //     priorityLevel: "veryHigh",
+            //   },
+            // },
           },
         });
       },

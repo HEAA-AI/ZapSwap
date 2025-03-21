@@ -4,7 +4,13 @@ import { useAppSelector } from "@/store/hooks";
 import { Bot, BotOff, RefreshCw, Settings } from "lucide-react";
 import { useState } from "react";
 
-function SlippageInfo({ slippage }: { slippage: number }) {
+function SlippageInfo({
+  slippage,
+  debounceQuoteCall,
+}: {
+  slippage: number;
+  debounceQuoteCall: any;
+}) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { manualSwapEnabled, slippageValue } = useAppSelector(
     (state) => state.global
@@ -18,7 +24,10 @@ function SlippageInfo({ slippage }: { slippage: number }) {
             Slippage:{" "}
             {slippageValue ? slippageValue : slippage ? slippage / 1000 : 0}%
           </div>
-          <RefreshCw className="opacity-50 cursor-pointer hover:opacity-80" />
+          <RefreshCw
+            onClick={debounceQuoteCall}
+            className="opacity-50 cursor-pointer hover:opacity-80"
+          />
         </div>
 
         <div className="flex items-center space-x-3">

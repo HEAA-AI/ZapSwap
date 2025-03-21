@@ -33,7 +33,6 @@ function SwapInput({
   loading,
 }: Props) {
   const [showModal, setShowModal] = useState(false);
-
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
       <div className="mb-2 text-sm text-gray-400">{title}</div>

@@ -36,7 +36,6 @@ const fetcher = async <T,>({
 }: ApiRequestConfig): Promise<ApiResponse<T>> => {
   try {
     // Retrieve token from the store
-    console.log(props);
     // Set up the Axios request configuration
     const config: AxiosRequestConfig = {
       method,
