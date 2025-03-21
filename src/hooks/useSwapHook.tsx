@@ -13,8 +13,6 @@ import useNetworkWallet from "./useNetworkWallet";
 import {
   AddressLookupTableAccount,
   PublicKey,
-  sendAndConfirmRawTransaction,
-  Transaction,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction,
@@ -314,8 +312,6 @@ function useSwapHook() {
     }
 
     try {
-      const blockhash = await connection.getRecentBlockhash("finalized");
-
       const outputTokenMint = new PublicKey(swapQuote?.data?.outputMint);
       const feeWallet = new PublicKey(ADMIN_FEE_ACCOUNT);
       const feeATA = await getAssociatedTokenAddress(
@@ -362,7 +358,7 @@ function useSwapHook() {
             state: AddressLookupTableAccount.deserialize(
               await connection
                 .getAccountInfo(lookup.accountKey)
-                .then((res) => res.data)
+                .then((res: any) => res.data)
             ),
           });
         })
