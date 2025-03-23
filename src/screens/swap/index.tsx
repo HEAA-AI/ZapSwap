@@ -10,11 +10,16 @@ import { useSolanaWallet } from "@/provider/WalletProvider";
 import SwapButton from "./components/SwapButton";
 import BgAnimation from "./components/BgAnimation";
 import useSwapHook from "@/hooks/useSwapHook";
+import { setBuyAmount, setSellAmount } from "@/store/reducers/globalSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { useWallet } from "@solana/wallet-adapter-react";
 export default function SwapPage() {
   const { setShowModal, connected } = useSolanaWallet(); // Wallet connection
+  const { publicKey } = useWallet();
+  console.log(publicKey);
+  const dispatch = useAppDispatch();
   const {
     sellAmount,
-    setSellAmount,
     sellCurrency,
     tokensList,
     setSellCurrency,
@@ -23,13 +28,12 @@ export default function SwapPage() {
     setTokenSearch,
     buyCurrency,
     swapQuote,
-    setBuyAmount,
     buyAmount,
     setBuyCurrency,
     signAndSendTransaction,
     tokenBalances,
     pairPriceLoading,
-    debounceQuoteCall,
+    // swapQuoteUpdate,
     swapLoading,
     isSubmitting,
   } = useSwapHook();
@@ -45,7 +49,9 @@ export default function SwapPage() {
             title="Sell"
             type="sell"
             amount={sellAmount}
-            handleAmount={setSellAmount}
+            handleAmount={(value) => {
+              dispatch(setSellAmount(value));
+            }}
             token={sellCurrency}
             tokens={tokensList}
             handleToken={setSellCurrency}
@@ -59,7 +65,9 @@ export default function SwapPage() {
             type="buy"
             amount={buyAmount}
             token={buyCurrency}
-            handleAmount={setBuyAmount}
+            handleAmount={(value) => {
+              dispatch(setBuyAmount(value));
+            }}
             tokens={tokensList}
             handleToken={setBuyCurrency}
             usdPrice={tokensPriceUsd?.buyAmount}
@@ -69,7 +77,7 @@ export default function SwapPage() {
           />
 
           <SlippageInfo
-            debounceQuoteCall={debounceQuoteCall}
+            // swapQuoteUpdate={swapQuoteUpdate}
             slippage={swapQuote?.data?.slippageBps}
           />
 

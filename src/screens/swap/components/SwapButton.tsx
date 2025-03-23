@@ -45,7 +45,13 @@ const SwapButton = ({
           "hover:bg-primary text-white bg-[#111] border border-[#d4ff00]/10",
       };
     }
-    if (!sellAmount) {
+
+    if (
+      sellAmount === undefined ||
+      sellAmount === null ||
+      sellAmount === "" ||
+      !Number(sellAmount)
+    ) {
       return {
         buttonText: "Enter Amount",
         extraClass:

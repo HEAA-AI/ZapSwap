@@ -1,15 +1,15 @@
-import SwapSettingModal from "@/components/global/SwapSettingModal";
+import SwapSettingModal from "@/components/global/modal/SwapSettingModal";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/hooks";
-import { Bot, BotOff, RefreshCw, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useState } from "react";
 
 function SlippageInfo({
   slippage,
-  debounceQuoteCall,
-}: {
+}: // swapQuoteUpdate,
+{
   slippage: number;
-  debounceQuoteCall: any;
+  // swapQuoteUpdate: any;
 }) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { manualSwapEnabled, slippageValue } = useAppSelector(
@@ -24,10 +24,10 @@ function SlippageInfo({
             Slippage:{" "}
             {slippageValue ? slippageValue : slippage ? slippage / 1000 : 0}%
           </div>
-          <RefreshCw
-            onClick={debounceQuoteCall}
+          {/* <RefreshCw
+            onClick={swapQuoteUpdate}
             className="opacity-50 cursor-pointer hover:opacity-80"
-          />
+          /> */}
         </div>
 
         <div className="flex items-center space-x-3">

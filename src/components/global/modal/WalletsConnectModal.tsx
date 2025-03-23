@@ -9,13 +9,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "../../ui/dialog";
 import { toast } from "sonner";
 
 const WalletsConnectModal = () => {
   const { wallets, showModal, setShowModal, select } = useSolanaWallet();
 
-  //
   const filteredAdapters = wallets?.reduce(
     (acc: any, wallet: Wallet) => {
       const adapterName = wallet?.adapter?.name;
@@ -27,17 +26,20 @@ const WalletsConnectModal = () => {
     { installed: [] }
   );
 
-  const onClickWallet = useCallback(async (wallet: WalletAdapter) => {
-    try {
-      select(wallet?.name);
-      toast.success("Wallet connected successfully.", {
-        description: "Your wallet has been connected securely.",
-      });
-      setShowModal(false);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  const onClickWallet = useCallback(
+    async (wallet: WalletAdapter) => {
+      try {
+        select(wallet?.name);
+        toast.success("Wallet connected successfully.", {
+          description: "Your wallet has been connected securely.",
+        });
+        setShowModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [select]
+  );
 
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>

@@ -19,16 +19,20 @@ import {
 } from "@solana/web3.js";
 import { useAppSelector } from "@/store/hooks";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setBuyAmount, setSellAmount } from "@/store/reducers/globalSlice";
 import { ToastAction } from "@/components/ui/toast";
 
 function useSwapHook() {
-  const [sellAmount, setSellAmount] = useState<string>(""); // Amount to sell
-  const [buyAmount, setBuyAmount] = useState<string>(""); // Amount to receive
+  // const [sellAmount, setSellAmount] = useState<string>(""); // Amount to sell
+  // const [buyAmount, setBuyAmount] = useState<string>(""); // Amount to receive
   const [tokenSearch, setTokenSearch] = useState<string>(""); // Token search input
   const [sellCurrency, setSellCurrency] = useState<Token | null>(null); // Selected token to sell
   const [buyCurrency, setBuyCurrency] = useState<Token | null>(null); // Selected token to buy
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { tokenBalances } = useNetworkWallet();
+  const { tokenBalances, fetchTokenBalances } = useNetworkWallet();
+  const { sellAmount, buyAmount } = useAppSelector((state) => state.global);
+  const dispatch = useDispatch();
   const { slippageValue, manualSwapEnabled } = useAppSelector(
     (state) => state.global
   );
@@ -68,20 +72,21 @@ function useSwapHook() {
 
   useEffect(() => {
     if (swapQuote?.data?.outAmount) {
-      setBuyAmount(
-        formatUnits(
-          swapQuote?.data?.outAmount,
-          buyCurrency?.decimals
-        ).toString()
+      dispatch(
+        setBuyAmount(
+          formatUnits(
+            swapQuote?.data?.outAmount,
+            buyCurrency?.decimals
+          ).toString()
+        )
       );
     }
   }, [swapQuote, buyCurrency]);
-
-  const debounceQuoteCall = useCallback(_.debounce(swapQuoteRefetch, 500), []);
+  const swapQuoteUpdate = useCallback(() => swapQuoteRefetch(), []);
 
   useEffect(() => {
-    debounceQuoteCall(sellAmount);
-  }, [sellAmount, debounceQuoteCall, slippageValue, manualSwapEnabled]);
+    swapQuoteUpdate();
+  }, [sellAmount, slippageValue, manualSwapEnabled]);
 
   // Generate filtered token list based on search input and selected tokens
   const tokensList = useMemo(() => {
@@ -202,7 +207,7 @@ function useSwapHook() {
       const signedTransaction = await signTransaction(transaction);
       const txid = await sendTransaction(signedTransaction, connection, {
         skipPreflight: true,
-        preflightCommitment: "confirmed",
+        preflightCommitment: "finalized",
       });
 
       toast.success("Transaction:", {
@@ -220,19 +225,23 @@ function useSwapHook() {
           </ToastAction>
         ),
       });
-      return txid;
+
+      dispatch(setBuyAmount(""));
+      dispatch(setSellAmount(""));
     } catch (error: any) {
       toast.error("Error signing or sending the transaction:", {
         description: error?.message,
       });
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        fetchTokenBalances();
+      }, 3000);
     }
   }
 
   return {
     sellAmount,
-    setSellAmount,
     sellCurrency,
     tokensList,
     setSellCurrency,
@@ -241,7 +250,6 @@ function useSwapHook() {
     setTokenSearch,
     buyCurrency,
     swapQuote,
-    setBuyAmount,
     buyAmount,
     setBuyCurrency,
     signAndSendTransaction,
@@ -249,7 +257,7 @@ function useSwapHook() {
     pairPriceLoading,
     swapLoading,
     isSubmitting,
-    debounceQuoteCall,
+    swapQuoteUpdate,
   };
 }
 

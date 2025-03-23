@@ -2,16 +2,19 @@ import { IMAGES } from "@/assets/images";
 import { Button } from "../ui/button";
 import { useSolanaWallet } from "@/provider/WalletProvider";
 import { useWallet } from "@solana/wallet-adapter-react";
-import MyTokenListModal from "./MyTokenListModal";
+import MyTokenListModal from "./modal/MyTokenListModal";
 import { useMemo, useState } from "react";
 import useNetworkWallet from "@/hooks/useNetworkWallet";
 import { SOLANA_ADDRESS } from "@/utility/constant";
 import { toast } from "sonner";
+import { Skeleton } from "../ui/skeleton";
+import { handleSolanaPriceFormat } from "@/utility/formatHandler";
 
 function Header() {
   const { setShowModal } = useSolanaWallet();
   const [showMyTokensModal, setShowMyTokensModal] = useState(false);
-  const { tokenBalances } = useNetworkWallet();
+  const { tokenBalances, tokenBalancesLoading } = useNetworkWallet();
+
   const { publicKey, connected, disconnect, connecting, disconnecting } =
     useWallet();
 
@@ -31,20 +34,32 @@ function Header() {
           variant="outline"
           className="rounded-full px-2 border-gray-700 bg-[#111111] hover:bg-[#272727] hover:text-white flex items-center gap-2"
         >
-          <img
-            className="flex items-center justify-center w-6 h-6 text-xs bg-blue-500 rounded-full"
-            src={
-              "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png"
-            }
-          />
-          <span>{`${solanaBalance?.balance?.toLocaleString()} ${
-            solanaBalance?.symbol
-          }`}</span>
+          {tokenBalancesLoading ? (
+            <Skeleton className="w-[100px] h-[20px] rounded-full" />
+          ) : (
+            <>
+              <img
+                className="flex items-center justify-center w-6 h-6 text-xs bg-blue-500 rounded-full"
+                src={
+                  "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png"
+                }
+              />
+              <span>
+                ${" "}
+                {handleSolanaPriceFormat(
+                  Number(solanaBalance?.balance),
+                  undefined
+                )}{" "}
+                {solanaBalance?.symbol}
+              </span>
+            </>
+          )}
         </Button>
       );
     }
     return;
   };
+
   return (
     <header className="container z-10 flex items-center justify-between px-4 py-4 mx-auto font-minecraft">
       <div className="flex items-center gap-2 ">

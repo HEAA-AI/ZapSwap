@@ -1,13 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
+type Props = {
+  manualSwapEnabled: boolean;
+  slippageValue: string;
+  sellAmount: string;
+  buyAmount: string;
+};
+
+const initialState: Props = {
   manualSwapEnabled: false,
   slippageValue: "",
+  sellAmount: "",
+  buyAmount: "",
 };
 const globalSlice = createSlice({
   name: "global",
   initialState: initialState,
   reducers: {
+    setSellAmount: (state, action) => {
+      state.sellAmount = action.payload;
+    },
+
+    setBuyAmount: (state, action) => {
+      state.buyAmount = action.payload;
+    },
+
     setManualSwap: (state, action) => {
       state.manualSwapEnabled = action.payload;
     },
@@ -21,8 +38,13 @@ const globalSlice = createSlice({
   },
 });
 
-export const { clearGlobal, setManualSwap, setSlippageValue } =
-  globalSlice.actions;
+export const {
+  clearGlobal,
+  setManualSwap,
+  setSlippageValue,
+  setSellAmount,
+  setBuyAmount,
+} = globalSlice.actions;
 
 const globalReducer = globalSlice.reducer;
 export default globalReducer;

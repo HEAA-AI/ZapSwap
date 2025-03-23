@@ -29,3 +29,22 @@ export const handleDecimalCountWithRange = (value: string) => {
 
   return value;
 };
+
+export const handleSolanaPriceFormat = (
+  price: number,
+  locale: string = "en-US"
+) => {
+  try {
+    if (!price || isNaN(price)) {
+      throw new Error("Invalid price value.");
+    }
+
+    return price.toLocaleString(locale, {
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 6,
+    });
+  } catch (error) {
+    console.error("Error formatting Solana price:", error);
+    return "0.00"; // Fallback value
+  }
+};

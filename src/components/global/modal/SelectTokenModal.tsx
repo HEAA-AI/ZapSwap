@@ -1,14 +1,8 @@
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 import { Search } from "lucide-react";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 import { ModalVisibilityType, Token } from "@/types/type";
+import RootModal from "./RootModal";
 
 interface Props extends ModalVisibilityType {
   tokens: Token[];
@@ -25,39 +19,38 @@ const SelectTokenModal = ({
   handleTokenSearch,
 }: Props) => {
   return (
-    <Dialog open={showModal} onOpenChange={setShowModal}>
-      <DialogContent className="bg-[#000000] pb-0  border-2 min-w-[400px]  px-5  max-w-[400px]  border-[#272727]  font-minecraft ">
-        <DialogHeader className="">
-          <DialogTitle className="mb-4 text-white ">Select a token</DialogTitle>
-          <DialogDescription>
-            <InputSearch
-              tokenSearch={tokenSearch}
-              handleTokenSearch={handleTokenSearch}
-            />
-            <div
-              className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
+    <RootModal
+      showModal={showModal}
+      handleModal={setShowModal}
+      title="Select a token"
+    >
+      <>
+        <InputSearch
+          tokenSearch={tokenSearch}
+          handleTokenSearch={handleTokenSearch}
+        />
+        <div
+          className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
               overflow-y-scroll h-full  max-h-[400px]`}
-            >
-              {!tokens?.length && (
-                <div className="flex items-center justify-center py-10">
-                  Token not found
-                </div>
-              )}
-              {tokens?.map((token: Token, index: number) => (
-                <TokenListItem
-                  handleToken={() => {
-                    handleToken(token);
-                    setShowModal(false);
-                  }}
-                  token={token}
-                  key={index}
-                />
-              ))}
+        >
+          {!tokens?.length && (
+            <div className="flex items-center justify-center py-10">
+              Token not found
             </div>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+          )}
+          {tokens?.map((token: Token, index: number) => (
+            <TokenListItem
+              handleToken={() => {
+                handleToken(token);
+                setShowModal(false);
+              }}
+              token={token}
+              key={index}
+            />
+          ))}
+        </div>
+      </>
+    </RootModal>
   );
 };
 

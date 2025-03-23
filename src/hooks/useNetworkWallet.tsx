@@ -6,14 +6,17 @@ import { IMAGES } from "@/assets/images";
 
 function useNetworkWallet() {
   const { connection, connected, publicKey } = useSolanaWallet();
+  const [tokenBalancesLoading, setTokenBalancesLoading] = useState(false);
   const [tokenBalances, setTokenBalances] = useState<TokenBalanceInfo[]>([]);
-  const { accountInfo } = JUPITER_SWAPPER.getMyAccountInfo({
+  const { accountInfo, accountInfoRefetch } = JUPITER_SWAPPER.getMyAccountInfo({
     address: publicKey?.toString() as string,
   });
   const apiData: any = useMemo(() => accountInfo?.data, [accountInfo]);
 
   // Fetch both SOL and SPL token balances
-  const fetchBalances = async () => {
+  const fetchTokenBalances = async () => {
+    setTokenBalancesLoading(true);
+
     try {
       const newBalances: TokenBalanceInfo[] = [];
 
@@ -83,14 +86,20 @@ function useNetworkWallet() {
       setTokenBalances(newBalances);
     } catch (error) {
       console.error("Error fetching balances:", error);
+    } finally {
+      setTokenBalancesLoading(false);
     }
   };
 
   useEffect(() => {
-    if (connected) fetchBalances();
+    if (connected) fetchTokenBalances();
   }, [connected, publicKey, accountInfo]);
 
-  return { tokenBalances };
+  return {
+    tokenBalances,
+    tokenBalancesLoading,
+    fetchTokenBalances: accountInfoRefetch,
+  };
 }
 
 export default useNetworkWallet;

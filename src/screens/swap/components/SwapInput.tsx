@@ -1,8 +1,11 @@
-import SelectTokenModal from "@/components/global/SelectTokenModal";
+import SelectTokenModal from "@/components/global/modal/SelectTokenModal";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Token } from "@/types/type";
-import { handleDecimalCount } from "@/utility/formatHandler";
+import {
+  handleDecimalCount,
+  handleSolanaPriceFormat,
+} from "@/utility/formatHandler";
 import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +36,7 @@ function SwapInput({
   loading,
 }: Props) {
   const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
       <div className="mb-2 text-sm text-gray-400">{title}</div>
@@ -90,12 +94,17 @@ function SwapInput({
           {loading ? (
             <Skeleton className="w-[100px] h-[15px] rounded-full" />
           ) : (
-            <>${Number(Number(amount) * Number(usdPrice)).toLocaleString()}</>
+            <>
+              $
+              {handleSolanaPriceFormat(
+                Number(Number(amount) * Number(usdPrice))
+              )}
+            </>
           )}
         </span>
         {token && (
           <span className="text-[#d4ff00]">
-            {token?.balance} {token?.symbol}{" "}
+            {handleSolanaPriceFormat(token?.balance, undefined)} {token?.symbol}{" "}
             {type == "sell" && (
               <span
                 onClick={() => {

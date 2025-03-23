@@ -1,12 +1,6 @@
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 import { ModalVisibilityType, TokenBalanceInfo } from "@/types/type";
+import RootModal from "./RootModal";
 
 interface Props extends ModalVisibilityType {
   tokenBalances: TokenBalanceInfo[];
@@ -17,28 +11,25 @@ const MyTokenListModal = ({
   setShowModal,
 }: Props) => {
   return (
-    <Dialog open={showModal} onOpenChange={setShowModal}>
-      <DialogContent className="bg-[#000000] pb-0  border-2 min-w-[400px]  px-5  max-w-[400px]  border-[#272727]  font-minecraft ">
-        <DialogHeader className="">
-          <DialogTitle className="mb-4 text-white ">My Tokens</DialogTitle>
-          <DialogDescription>
-            <div
-              className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
+    <RootModal
+      showModal={showModal}
+      handleModal={setShowModal}
+      title="My Tokens"
+    >
+      <div
+        className={`flex pb-5 flex-col transition-all duration-500 ease-in-out 
               overflow-y-scroll h-full  max-h-[400px]`}
-            >
-              {!tokenBalances?.length && (
-                <div className="flex items-center justify-center py-10">
-                  Tokens not found
-                </div>
-              )}
-              {tokenBalances?.map((token: TokenBalanceInfo, index: number) => (
-                <TokenListItem token={token} key={index} />
-              ))}
-            </div>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+      >
+        {!tokenBalances?.length && (
+          <div className="flex items-center justify-center py-10">
+            Tokens not found
+          </div>
+        )}
+        {tokenBalances?.map((token: TokenBalanceInfo, index: number) => (
+          <TokenListItem token={token} key={index} />
+        ))}
+      </div>
+    </RootModal>
   );
 };
 
