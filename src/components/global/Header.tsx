@@ -61,7 +61,7 @@ function Header() {
   };
 
   return (
-    <header className="container z-10 flex items-center justify-between px-4 py-4 mx-auto font-minecraft">
+    <header className="container z-10 flex flex-wrap items-center justify-between px-4 py-4 mx-auto gap-y-3 font-minecraft">
       <div className="flex items-center gap-2 ">
         <div className="relative w-8 h-8 ">
           <img
@@ -75,7 +75,7 @@ function Header() {
         <span className="text-xl font-bold ">ZapSwap</span>
       </div>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end flex-1 gap-2 sm:flex-nowrap">
         {renderSolanaPrice()}
         <Button
           onClick={() => {

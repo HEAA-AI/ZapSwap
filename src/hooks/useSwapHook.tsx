@@ -7,7 +7,6 @@ import {
 import { Token } from "@/types/type";
 import { ADMIN_FEE_ACCOUNT, SWAP_PLATFORM_FEE } from "@/utility/constant";
 import { formatUnits, parseUnits } from "ethers";
-import _ from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useNetworkWallet from "./useNetworkWallet";
 import {
@@ -24,14 +23,12 @@ import { setBuyAmount, setSellAmount } from "@/store/reducers/globalSlice";
 import { ToastAction } from "@/components/ui/toast";
 
 function useSwapHook() {
-  // const [sellAmount, setSellAmount] = useState<string>(""); // Amount to sell
-  // const [buyAmount, setBuyAmount] = useState<string>(""); // Amount to receive
-  const [tokenSearch, setTokenSearch] = useState<string>(""); // Token search input
-  const [sellCurrency, setSellCurrency] = useState<Token | null>(null); // Selected token to sell
-  const [buyCurrency, setBuyCurrency] = useState<Token | null>(null); // Selected token to buy
+  const [tokenSearch, setTokenSearch] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { tokenBalances, fetchTokenBalances } = useNetworkWallet();
-  const { sellAmount, buyAmount } = useAppSelector((state) => state.global);
+  const { sellAmount, buyAmount, sellCurrency, buyCurrency } = useAppSelector(
+    (state) => state.global
+  );
   const dispatch = useDispatch();
   const { slippageValue, manualSwapEnabled } = useAppSelector(
     (state) => state.global
@@ -80,6 +77,9 @@ function useSwapHook() {
           ).toString()
         )
       );
+    }
+    if (sellAmount === "") {
+      dispatch(setBuyAmount(""));
     }
   }, [swapQuote, buyCurrency]);
   const swapQuoteUpdate = useCallback(() => swapQuoteRefetch(), []);
@@ -244,14 +244,12 @@ function useSwapHook() {
     sellAmount,
     sellCurrency,
     tokensList,
-    setSellCurrency,
     tokensPriceUsd,
     tokenSearch,
     setTokenSearch,
     buyCurrency,
     swapQuote,
     buyAmount,
-    setBuyCurrency,
     signAndSendTransaction,
     tokenBalances,
     pairPriceLoading,

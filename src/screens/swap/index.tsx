@@ -10,7 +10,12 @@ import { useSolanaWallet } from "@/provider/WalletProvider";
 import SwapButton from "./components/SwapButton";
 import BgAnimation from "./components/BgAnimation";
 import useSwapHook from "@/hooks/useSwapHook";
-import { setBuyAmount, setSellAmount } from "@/store/reducers/globalSlice";
+import {
+  setBuyAmount,
+  setBuyCurrency,
+  setSellAmount,
+  setSellCurrency,
+} from "@/store/reducers/globalSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useWallet } from "@solana/wallet-adapter-react";
 export default function SwapPage() {
@@ -22,18 +27,15 @@ export default function SwapPage() {
     sellAmount,
     sellCurrency,
     tokensList,
-    setSellCurrency,
     tokensPriceUsd,
     tokenSearch,
     setTokenSearch,
     buyCurrency,
     swapQuote,
     buyAmount,
-    setBuyCurrency,
     signAndSendTransaction,
     tokenBalances,
     pairPriceLoading,
-    // swapQuoteUpdate,
     swapLoading,
     isSubmitting,
   } = useSwapHook();
@@ -54,12 +56,20 @@ export default function SwapPage() {
             }}
             token={sellCurrency}
             tokens={tokensList}
-            handleToken={setSellCurrency}
+            handleToken={(value) => {
+              dispatch(setSellCurrency(value));
+            }}
             usdPrice={tokensPriceUsd?.sellAmount}
             tokenSearch={tokenSearch}
             handleTokenSearch={setTokenSearch}
           />
-          <ArrowDivider />
+          <ArrowDivider
+            sellCurrency={sellCurrency}
+            buyCurrency={buyCurrency}
+            sellAmount={sellAmount}
+            buyAmount={buyAmount}
+            disabled={swapLoading || isSubmitting}
+          />
           <SwapInput
             title="Buy"
             type="buy"
@@ -69,7 +79,9 @@ export default function SwapPage() {
               dispatch(setBuyAmount(value));
             }}
             tokens={tokensList}
-            handleToken={setBuyCurrency}
+            handleToken={(value) => {
+              dispatch(setBuyCurrency(value));
+            }}
             usdPrice={tokensPriceUsd?.buyAmount}
             tokenSearch={tokenSearch}
             handleTokenSearch={setTokenSearch}

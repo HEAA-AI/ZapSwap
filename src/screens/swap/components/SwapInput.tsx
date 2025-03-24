@@ -40,7 +40,7 @@ function SwapInput({
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
       <div className="mb-2 text-sm text-gray-400">{title}</div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between space-x-5 ">
         {loading ? (
           <Skeleton className="w-[100px] h-[20px] rounded-full" />
         ) : (
@@ -59,11 +59,11 @@ function SwapInput({
               const validValue = handleDecimalCount(pastedValue);
               handleAmount(validValue);
             }}
-            className="w-1/2 text-3xl font-medium bg-transparent focus:outline-none"
+            className="flex-1 w-full text-2xl font-medium bg-transparent focus:outline-none"
           />
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           {token ? (
             <Button
               onClick={() => setShowModal(true)}
@@ -81,7 +81,7 @@ function SwapInput({
             <Button
               onClick={() => setShowModal(true)}
               variant="outline"
-              className="rounded-full border-gray-700  text-black bg-[#d4ff00] hover:bg-[#c2ee00]  flex items-center gap-2"
+              className="rounded-full border-gray-700  text-black bg-[#d4ff00] hover:bg-[#c2ee00]   flex items-center gap-2"
             >
               <span>Select Token</span>
               <Plus size={16} />
@@ -89,10 +89,10 @@ function SwapInput({
           )}
         </div>
       </div>
-      <div className="flex justify-between mt-2">
-        <span className="text-gray-400">
+      <div className="flex items-center justify-between mt-2 space-x-8">
+        <span className="flex-[0.60] text-xs text-gray-400 break-all">
           {loading ? (
-            <Skeleton className="w-[100px] h-[15px] rounded-full" />
+            <Skeleton className="min-w-[100px] h-[15px] rounded-full" />
           ) : (
             <>
               $
@@ -103,8 +103,11 @@ function SwapInput({
           )}
         </span>
         {token && (
-          <span className="text-[#d4ff00]">
-            {handleSolanaPriceFormat(token?.balance, undefined)} {token?.symbol}{" "}
+          <div className="text-[#d4ff00] items-center space-x-2 flex flex-[0.40] justify-end">
+            <span>
+              {handleSolanaPriceFormat(token?.balance, undefined)}{" "}
+              {token?.symbol}
+            </span>
             {type == "sell" && (
               <span
                 onClick={() => {
@@ -115,7 +118,7 @@ function SwapInput({
                 Max
               </span>
             )}
-          </span>
+          </div>
         )}
       </div>
       <SelectTokenModal

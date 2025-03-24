@@ -1,3 +1,4 @@
+import { Token } from "@/types/type";
 import { createSlice } from "@reduxjs/toolkit";
 
 type Props = {
@@ -5,6 +6,8 @@ type Props = {
   slippageValue: string;
   sellAmount: string;
   buyAmount: string;
+  sellCurrency: Token | null;
+  buyCurrency: Token | null;
 };
 
 const initialState: Props = {
@@ -12,7 +15,10 @@ const initialState: Props = {
   slippageValue: "",
   sellAmount: "",
   buyAmount: "",
+  sellCurrency: null,
+  buyCurrency: null,
 };
+
 const globalSlice = createSlice({
   name: "global",
   initialState: initialState,
@@ -23,6 +29,14 @@ const globalSlice = createSlice({
 
     setBuyAmount: (state, action) => {
       state.buyAmount = action.payload;
+    },
+
+    setSellCurrency: (state, action) => {
+      state.sellCurrency = action.payload;
+    },
+
+    setBuyCurrency: (state, action) => {
+      state.buyCurrency = action.payload;
     },
 
     setManualSwap: (state, action) => {
@@ -44,6 +58,8 @@ export const {
   setSlippageValue,
   setSellAmount,
   setBuyAmount,
+  setSellCurrency,
+  setBuyCurrency,
 } = globalSlice.actions;
 
 const globalReducer = globalSlice.reducer;

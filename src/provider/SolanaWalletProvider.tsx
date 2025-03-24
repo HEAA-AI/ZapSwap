@@ -3,8 +3,13 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
+
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
+import {
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
+
 import { useCallback, useMemo, ReactNode } from "react";
 import { SOLANA_RPC_URL } from "@/utility/constant";
 import { Toaster } from "@/components/ui/sonner";
@@ -28,9 +33,12 @@ function SolanaProvider({ children }: SolanaProviderProps) {
   // Initialize the wallet adapter
   const wallets = useMemo(
     () => [
-      new SolflareWalletAdapter({
-        // network: WalletAdapterNetwork.Mainnet,
+      new PhantomWalletAdapter({
+        config: {
+          linkingUri: window.location.origin + "/wallet-redirect",
+        },
       }),
+      new SolflareWalletAdapter(),
     ],
     []
   );
@@ -44,8 +52,8 @@ function SolanaProvider({ children }: SolanaProviderProps) {
   }, []);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
+    <ConnectionProvider endpoint={endpoint} config={{}}>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect={false}>
         <WalletModalProvider>
           {children}
           <Toaster

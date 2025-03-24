@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { useSolanaWallet } from "@/provider/WalletProvider";
 import { WalletAdapter, WalletReadyState } from "@solana/wallet-adapter-base";
 import { Wallet } from "@solana/wallet-adapter-react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,15 @@ import {
 import { toast } from "sonner";
 
 const WalletsConnectModal = () => {
-  const { wallets, showModal, setShowModal, select } = useSolanaWallet();
+  const {
+    wallets,
+    showModal,
+    setShowModal,
+    select,
+    connected,
+    connect,
+    wallet,
+  } = useSolanaWallet();
 
   const filteredAdapters = wallets?.reduce(
     (acc: any, wallet: Wallet) => {
@@ -21,24 +29,51 @@ const WalletsConnectModal = () => {
       if (wallet.readyState === WalletReadyState.Installed && adapterName) {
         acc.installed.push(wallet?.adapter);
       }
+
+      if (wallet.readyState === WalletReadyState.Loadable && adapterName) {
+        acc.loadable.push(wallet?.adapter);
+      }
+
+      if (wallet.readyState === WalletReadyState.NotDetected && adapterName) {
+        acc.notDetected.push(wallet?.adapter);
+      }
+
       return acc;
     },
-    { installed: [] }
+    { installed: [], loadable: [], notDetected: [] }
   );
+
+  console.log(filteredAdapters);
+  useEffect(() => {
+    if (connected && wallet) {
+      toast.success("Wallet connected successfully", {
+        description: "Your wallet has been connected securely.",
+      });
+    }
+  }, [connected, wallet]);
 
   const onClickWallet = useCallback(
     async (wallet: WalletAdapter) => {
       try {
+        console.log(wallet, "wallet");
         select(wallet?.name);
-        toast.success("Wallet connected successfully.", {
-          description: "Your wallet has been connected securely.",
+        await connect().then((res) => console.log(res, "res"));
+
+        if (wallet.readyState === WalletReadyState.NotDetected) {
+          throw new Error(
+            "No compatible wallet detected. Please install a Solana wallet like Phantom or Solflare and try again."
+          );
+        }
+        setShowModal(false);
+      } catch (error: any) {
+        console.log(error, "errorerrorerrorerror");
+        toast.error("Wallet connected issue.", {
+          description: error?.message,
         });
         setShowModal(false);
-      } catch (error) {
-        console.log(error);
       }
     },
-    [select]
+    [select, connect, setShowModal]
   );
 
   return (
@@ -58,7 +93,25 @@ const WalletsConnectModal = () => {
                     key={index}
                   />
                 )
-              )}{" "}
+              )}
+              {filteredAdapters?.loadable?.map(
+                (wallet: WalletAdapter, index: number) => (
+                  <WalletListItem
+                    handleClick={() => onClickWallet(wallet)}
+                    walletAdapter={wallet}
+                    key={index}
+                  />
+                )
+              )}
+              {filteredAdapters?.notDetected?.map(
+                (wallet: WalletAdapter, index: number) => (
+                  <WalletListItem
+                    handleClick={() => onClickWallet(wallet)}
+                    walletAdapter={wallet}
+                    key={index}
+                  />
+                )
+              )}
             </div>
           </DialogDescription>
         </DialogHeader>
