@@ -76,13 +76,19 @@ const TokenListItem = ({
         <div>
           <div className="text-white text-md">{token?.name}</div>
           <div className="text-xs text-white/50">{token?.symbol}</div>
+          <div className="text-[10px] text-[#d4ff00]/70 group-hover:text-[#d4ff00]">{`${token?.address?.slice(
+            0,
+            6
+          )}...${token?.address?.slice(-6)}`}</div>
         </div>
       </div>
       <div>
         {token?.balance > 0 && (
-          <div className=" font-minecraft text-[10px] group-hover:text-[#d4ff00] ">
-            {`${Number(token?.balance).toLocaleString()} ${token?.symbol}`}
-          </div>
+          <>
+            <div className=" font-minecraft text-[10px] group-hover:text-[#d4ff00] ">
+              {`${Number(token?.balance).toLocaleString()} ${token?.symbol}`}
+            </div>
+          </>
         )}
       </div>
     </div>
