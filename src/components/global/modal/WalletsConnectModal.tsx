@@ -43,7 +43,6 @@ const WalletsConnectModal = () => {
     { installed: [], loadable: [], notDetected: [] }
   );
 
-  console.log(filteredAdapters);
   useEffect(() => {
     if (connected && wallet) {
       toast.success("Wallet connected successfully", {
@@ -55,7 +54,6 @@ const WalletsConnectModal = () => {
   const onClickWallet = useCallback(
     async (wallet: WalletAdapter) => {
       try {
-        console.log(wallet, "wallet");
         select(wallet?.name);
         await connect().then((res) => console.log(res, "res"));
 
@@ -66,7 +64,6 @@ const WalletsConnectModal = () => {
         }
         setShowModal(false);
       } catch (error: any) {
-        console.log(error, "errorerrorerrorerror");
         toast.error("Wallet connected issue.", {
           description: error?.message,
         });

@@ -17,11 +17,8 @@ import {
   setSellCurrency,
 } from "@/store/reducers/globalSlice";
 import { useAppDispatch } from "@/store/hooks";
-import { useWallet } from "@solana/wallet-adapter-react";
 export default function SwapPage() {
   const { setShowModal, connected } = useSolanaWallet(); // Wallet connection
-  const { publicKey } = useWallet();
-  console.log(publicKey);
   const dispatch = useAppDispatch();
   const {
     sellAmount,

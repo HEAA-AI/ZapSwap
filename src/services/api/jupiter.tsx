@@ -38,20 +38,6 @@ class JupiterSwapper {
         taker,
       ],
       queryFn: async () => {
-        console.log({
-          inputMint,
-          outputMint,
-          amount,
-          slippageBps,
-          restrictIntermediateTokens,
-          platformFeeBps,
-          onlyDirectRoutes: false,
-          asLegacyTransaction: false,
-          maxAccounts: 64,
-          computeAutoSlippage: true,
-          minimizeSlippage: false,
-          taker,
-        });
         return await fetcher({
           url: `${JUPITER_API}/quote`,
           isBaseUrl: false,

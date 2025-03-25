@@ -131,9 +131,9 @@ function useSwapHook() {
 
   async function signAndSendTransaction() {
     if (!connected || !signTransaction || !sendTransaction || !publicKey) {
-      console.error(
-        "Wallet is not connected or does not support signing transactions"
-      );
+      // console.error(
+      //   "Wallet is not connected or does not support signing transactions"
+      // );
       return;
     }
     setIsSubmitting(true);
@@ -149,7 +149,7 @@ function useSwapHook() {
 
       // Perform ATA creation FIRST if it does not exist
       if (!ataInfo) {
-        console.log("Creating ATA for fee collection...");
+        // console.log("Creating ATA for fee collection...");
         const createAtaIx = createAssociatedTokenAccountInstruction(
           publicKey, // Fee payer (user)
           feeATA, // New ATA address
@@ -160,7 +160,7 @@ function useSwapHook() {
       }
 
       // Now execute the swap transaction
-      console.log("Executing swap transaction...");
+      // console.log("Executing swap transaction...");
       const swapTransaction: any = await swapMutateAsync({
         quoteResponse: swapQuote?.data,
         feeAccount: feeATA.toString(), // Use the created ATA

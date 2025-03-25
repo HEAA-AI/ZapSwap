@@ -56,8 +56,7 @@ export const handleSolanaPriceFormat = (
       minimumFractionDigits: 4,
       maximumFractionDigits: 6,
     });
-  } catch (error) {
-    console.error("Error formatting Solana price:", error);
+  } catch {
     return "0.00"; // Fallback value
   }
 };

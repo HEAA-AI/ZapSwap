@@ -84,8 +84,8 @@ function useNetworkWallet() {
       }
 
       setTokenBalances(newBalances);
-    } catch (error) {
-      console.error("Error fetching balances:", error);
+    } catch {
+      // console.error("Error fetching balances:", error);
     } finally {
       setTokenBalancesLoading(false);
     }

@@ -45,7 +45,6 @@ function SolanaProvider({ children }: SolanaProviderProps) {
 
   // Handle wallet connection errors
   const onError = useCallback((error: WalletError) => {
-    console.error("Wallet Connection Error:", error);
     toast.error("Wallet Connection Error:", {
       description: error?.message,
     });
