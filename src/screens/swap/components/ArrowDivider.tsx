@@ -16,6 +16,7 @@ type Props = {
   buyCurrency: Token | null;
   disabled: boolean;
 };
+
 function ArrowDivider({
   sellAmount,
   buyAmount,

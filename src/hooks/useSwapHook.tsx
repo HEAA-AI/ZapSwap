@@ -81,7 +81,7 @@ function useSwapHook() {
     if (sellAmount === "") {
       dispatch(setBuyAmount(""));
     }
-  }, [swapQuote, buyCurrency]);
+  }, [swapQuote, buyCurrency, sellAmount]);
   const swapQuoteUpdate = useCallback(() => swapQuoteRefetch(), []);
 
   useEffect(() => {
@@ -95,6 +95,7 @@ function useSwapHook() {
     // Map tokens into desired format and add balance from tokenBalances if available
     const allTokens: Token[] = tokens.data.tokens.map((token: any) => {
       const foundToken = tokenBalances.find((t) => t.mint === token.address);
+
       return {
         address: token?.address,
         decimals: token?.decimals,
@@ -114,7 +115,8 @@ function useSwapHook() {
           token.address !== buyCurrency?.address
       );
     }
-
+    // dispatch(setSellAmount(value));
+    // dispatch(setBuyAmount(value));
     return allTokens
       .filter(
         (token: Token) =>

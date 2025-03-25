@@ -58,6 +58,7 @@ export default function SwapPage() {
             }}
             usdPrice={tokensPriceUsd?.sellAmount}
             tokenSearch={tokenSearch}
+            tokenBalances={tokenBalances}
             handleTokenSearch={setTokenSearch}
           />
           <ArrowDivider
@@ -79,6 +80,7 @@ export default function SwapPage() {
             handleToken={(value) => {
               dispatch(setBuyCurrency(value));
             }}
+            tokenBalances={tokenBalances}
             usdPrice={tokensPriceUsd?.buyAmount}
             tokenSearch={tokenSearch}
             handleTokenSearch={setTokenSearch}

@@ -1,13 +1,13 @@
 import SelectTokenModal from "@/components/global/modal/SelectTokenModal";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Token } from "@/types/type";
+import { Token, TokenBalanceInfo } from "@/types/type";
 import {
   handleDecimalCount,
   handleSolanaPriceFormat,
 } from "@/utility/formatHandler";
 import { ChevronDown, Plus } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Props = {
   amount: string;
@@ -21,6 +21,7 @@ type Props = {
   handleToken: (token: Token) => void;
   handleTokenSearch: (search: string) => void;
   loading?: boolean;
+  tokenBalances: TokenBalanceInfo[];
 };
 function SwapInput({
   amount,
@@ -32,10 +33,19 @@ function SwapInput({
   handleToken,
   usdPrice,
   tokenSearch,
+  tokenBalances,
   handleTokenSearch,
   loading,
 }: Props) {
   const [showModal, setShowModal] = useState(false);
+  const tokenBalance = useMemo(() => {
+    if (!token?.address) return null;
+    return (
+      tokenBalances.find(
+        (t) => t.mint.toLowerCase() === token.address.toLowerCase()
+      )?.balance || 0
+    );
+  }, [token?.address, tokenBalances]);
 
   return (
     <div className="bg-[#111] border border-transparent hover:border-[#d4ff00]/50 transition delay-100 rounded-xl p-4 font-minecraft">
@@ -105,13 +115,13 @@ function SwapInput({
         {token && (
           <div className="text-[#d4ff00] items-center space-x-2 flex flex-[0.40] justify-end">
             <span>
-              {handleSolanaPriceFormat(token?.balance, undefined)}{" "}
+              {handleSolanaPriceFormat(Number(tokenBalance), undefined)}{" "}
               {token?.symbol}
             </span>
             {type == "sell" && (
               <span
                 onClick={() => {
-                  handleAmount(String(token?.balance));
+                  handleAmount(String(tokenBalance));
                 }}
                 className="text-sm text-gray-400 cursor-pointer hover:text-white"
               >

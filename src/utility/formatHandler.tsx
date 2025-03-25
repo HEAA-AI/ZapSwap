@@ -1,3 +1,29 @@
+// export const handleDecimalCount = (value: string) => {
+//   // Allow only numbers and one decimal point
+//   if (!/^\d*\.?\d*$/.test(value)) return value.slice(0, -1);
+
+//   // Prevent multiple decimal points
+//   const parts = value.split(".");
+//   if (parts.length > 2) return value.slice(0, -1);
+
+//   // Limit decimal places to 6
+//   if (parts.length === 2 && parts[1].length > 6) {
+//     return `${parts[0]}.${parts[1].slice(0, 6)}`;
+//   }
+
+//   // Define max integer limit (99 quadrillion)
+//   const MAX_LIMIT = "99999999999999999"; // 17 digits (without decimals)
+//   let integerPart = parts[0];
+
+//   // If the integer part exceeds 17 digits, trim extra digits
+//   if (integerPart.length > MAX_LIMIT.length) {
+//     integerPart = integerPart.slice(0, MAX_LIMIT.length);
+//   }
+
+//   // Reconstruct the valid number
+//   return parts.length === 2 ? `${integerPart}.${parts[1]}` : integerPart;
+// };
+
 export const handleDecimalCount = (value: string) => {
   // Allow only numbers and one decimal point
   if (!/^\d*\.?\d*$/.test(value)) return value.slice(0, -1);
@@ -6,22 +32,17 @@ export const handleDecimalCount = (value: string) => {
   const parts = value.split(".");
   if (parts.length > 2) return value.slice(0, -1);
 
+  // Convert leading zeros like "01123" to "0.1123"
+  if (/^0\d+/.test(parts[0])) {
+    return `0.${parts[0].slice(1)}${parts.length === 2 ? "." + parts[1] : ""}`;
+  }
+
   // Limit decimal places to 6
   if (parts.length === 2 && parts[1].length > 6) {
     return `${parts[0]}.${parts[1].slice(0, 6)}`;
   }
 
-  // Define max integer limit (99 quadrillion)
-  const MAX_LIMIT = "99999999999999999"; // 17 digits (without decimals)
-  let integerPart = parts[0];
-
-  // If the integer part exceeds 17 digits, trim extra digits
-  if (integerPart.length > MAX_LIMIT.length) {
-    integerPart = integerPart.slice(0, MAX_LIMIT.length);
-  }
-
-  // Reconstruct the valid number
-  return parts.length === 2 ? `${integerPart}.${parts[1]}` : integerPart;
+  return value;
 };
 
 export const handleDecimalCountWithRange = (value: string) => {
