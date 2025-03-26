@@ -5,13 +5,14 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { Token } from "@/types/type";
-import { ADMIN_FEE_ACCOUNT, SWAP_PLATFORM_FEE } from "@/utility/constant";
+import { ADMIN_FEE_ACCOUNT, SOLANA_ADDRESS } from "@/utility/constant";
 import { formatUnits, parseUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useNetworkWallet from "./useNetworkWallet";
 import {
   AddressLookupTableAccount,
   PublicKey,
+  SystemProgram,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction,
@@ -40,6 +41,11 @@ function useSwapHook() {
     query: tokenSearch,
   });
 
+  const { pairPrice: solanaPrice, pairPriceRefetch: solanaPriceRefetch }: any =
+    JUPITER_SWAPPER.getPairPrice({
+      listAddress: `${SOLANA_ADDRESS}`,
+    });
+
   // Fetch price of selected pair
   const { pairPrice, pairPriceLoading }: any = JUPITER_SWAPPER.getPairPrice({
     listAddress: `${sellCurrency?.address},${buyCurrency?.address}`,
@@ -61,7 +67,7 @@ function useSwapHook() {
       ? parseUnits(sellAmount, sellCurrency?.decimals).toString()
       : "",
     outputMint: buyCurrency?.address as string,
-    platformFeeBps: SWAP_PLATFORM_FEE,
+    // platformFeeBps: SWAP_PLATFORM_FEE,
     slippageBps: slippageValue ? Number(slippageValue) * 100 : "50",
     restrictIntermediateTokens: true,
     taker: publicKey?.toString() as string,
@@ -82,6 +88,7 @@ function useSwapHook() {
       dispatch(setBuyAmount(""));
     }
   }, [swapQuote, buyCurrency, sellAmount]);
+
   const swapQuoteUpdate = useCallback(() => swapQuoteRefetch(), []);
 
   useEffect(() => {
@@ -161,11 +168,35 @@ function useSwapHook() {
         instructions.push(createAtaIx);
       }
 
+      if (!Object.keys(solanaPrice?.data?.prices).length) {
+        await solanaPriceRefetch();
+        throw new Error("Something went wrong , please try again");
+      }
+
+      const amountSentAsFee = String(
+        (Number(swapQuote?.data?.swapUsdValue) * 0.004) /
+          solanaPrice?.data?.prices[SOLANA_ADDRESS]
+      );
+
+      const amount = Number(
+        parseUnits(parseFloat(amountSentAsFee).toFixed(6), 9)
+      );
+
+      console.log(amount);
+
+      instructions.push(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: feeWallet,
+          lamports: 1_00_00000 > amount ? 1_00_00000 : amount,
+        })
+      );
+
       // Now execute the swap transaction
       // console.log("Executing swap transaction...");
       const swapTransaction: any = await swapMutateAsync({
         quoteResponse: swapQuote?.data,
-        feeAccount: feeATA.toString(), // Use the created ATA
+        // feeAccount: feeATA.toString(), // Use the created ATA
         userPublicKey: publicKey.toString(),
       });
 

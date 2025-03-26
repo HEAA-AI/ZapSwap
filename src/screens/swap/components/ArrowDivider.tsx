@@ -5,6 +5,7 @@ import {
   setSellCurrency,
 } from "@/store/reducers/globalSlice";
 import { Token } from "@/types/type";
+import { handleDecimalCount } from "@/utility/formatHandler";
 import { ArrowDownUp } from "lucide-react";
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -27,8 +28,8 @@ function ArrowDivider({
   const dispatch = useDispatch();
 
   const handelSwap = useCallback(() => {
-    dispatch(setBuyAmount(sellAmount));
-    dispatch(setSellAmount(buyAmount));
+    dispatch(setBuyAmount(handleDecimalCount(sellAmount)));
+    dispatch(setSellAmount(handleDecimalCount(buyAmount)));
     dispatch(setSellCurrency(buyCurrency));
     dispatch(setBuyCurrency(sellCurrency));
   }, [sellAmount, buyAmount, sellCurrency, buyCurrency]);

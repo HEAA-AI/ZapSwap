@@ -22,7 +22,7 @@ function SlippageInfo({
         <div className="flex items-center space-x-3">
           <div className="text-xs bg-[#222] rounded-full px-3 py-2">
             Slippage:{" "}
-            {slippageValue ? slippageValue : slippage ? slippage / 1000 : 0}%
+            {slippageValue ? slippageValue : slippage ? slippage / 100 : 0}%
           </div>
           {/* <RefreshCw
             onClick={swapQuoteUpdate}

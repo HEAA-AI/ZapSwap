@@ -42,6 +42,11 @@ export const handleDecimalCount = (value: string) => {
     return `${parts[0]}.${parts[1].slice(0, 6)}`;
   }
 
+  // Limit integer part to 30 digits
+  if (parts[0].length > 30) {
+    return parts[0].slice(0, 30) + (parts.length === 2 ? "." + parts[1] : "");
+  }
+
   return value;
 };
 

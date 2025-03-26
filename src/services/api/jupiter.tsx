@@ -49,6 +49,13 @@ class JupiterSwapper {
             slippageBps,
             restrictIntermediateTokens,
             platformFeeBps,
+            //new
+            swapMode: "ExactIn",
+            onlyDirectRoutes: false,
+            asLegacyTransaction: false,
+            maxAccounts: 64,
+            computeAutoSlippage: true,
+            minimizeSlippage: false,
           },
         });
       },
@@ -145,11 +152,11 @@ class JupiterSwapper {
       mutationFn: async ({
         quoteResponse,
         userPublicKey,
-        feeAccount,
-      }: {
+      }: // feeAccount,
+      {
         quoteResponse: any;
         userPublicKey: any;
-        feeAccount: string;
+        // feeAccount: string;
       }) => {
         return await fetcher({
           url: `${JUPITER_API}/swap`,
@@ -158,7 +165,7 @@ class JupiterSwapper {
           bodyData: {
             quoteResponse,
             userPublicKey,
-            feeAccount,
+            // feeAccount,
 
             // wrapAndUnwrapSol: true,
             // ADDITIONAL PARAMETERS TO OPTIMIZE FOR TRANSACTION LANDING
