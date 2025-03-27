@@ -52,7 +52,7 @@ function SolanaProvider({ children }: SolanaProviderProps) {
 
   return (
     <ConnectionProvider endpoint={endpoint} config={{}}>
-      <WalletProvider wallets={wallets} onError={onError} autoConnect={false}>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
         <WalletModalProvider>
           {children}
           <Toaster

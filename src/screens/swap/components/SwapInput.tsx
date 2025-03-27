@@ -113,11 +113,13 @@ function SwapInput({
           )}
         </span>
         {token && (
-          <div className="text-[#d4ff00] items-center space-x-2 flex flex-[0.40] justify-end">
-            <span>
-              {handleSolanaPriceFormat(Number(tokenBalance), undefined)}{" "}
-              {token?.symbol}
-            </span>
+          <div className="text-[#d4ff00] items-center space-x-2 text-xs  flex flex-[0.40] justify-end">
+            <div className="flex justify-end space-x-2 text-left ">
+              <span className="">
+                {handleSolanaPriceFormat(Number(tokenBalance), undefined)}
+              </span>
+              <span>{token?.symbol}</span>
+            </div>
             {type == "sell" && (
               <span
                 onClick={() => {

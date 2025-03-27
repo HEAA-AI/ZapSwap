@@ -21,6 +21,7 @@ const WalletsConnectModal = () => {
     connected,
     connect,
     wallet,
+    publicKey,
   } = useSolanaWallet();
 
   const filteredAdapters = wallets?.reduce(
@@ -51,19 +52,40 @@ const WalletsConnectModal = () => {
     }
   }, [connected, wallet]);
 
+  useEffect(() => {
+    if (publicKey) {
+      // Dispatch a custom event when the wallet address changes
+      const event = new CustomEvent("wallet-address-changed", {
+        detail: { address: publicKey.toBase58() },
+      });
+      window.dispatchEvent(event);
+
+      // Optionally, show a toast notification
+      toast.info("Wallet Connected", {
+        description: `Connected with address: ${publicKey.toBase58()}`,
+      });
+    }
+  }, [publicKey]);
+
   const onClickWallet = useCallback(
     async (wallet: WalletAdapter) => {
       try {
         select(wallet?.name);
-        await connect().then((res) => console.log(res, "res"));
-
+        // await wallet.connect();
         if (wallet.readyState === WalletReadyState.NotDetected) {
           throw new Error(
             "No compatible wallet detected. Please install a Solana wallet like Phantom or Solflare and try again."
           );
         }
+        setTimeout(async () => {
+          await connect()
+            .then((res) => console.log("Wallet Connected:", res))
+            .catch((err) => console.error("Connect Error:", err));
+        }, 500);
+
         setShowModal(false);
       } catch (error: any) {
+        console.log(error);
         toast.error("Wallet connected issue.", {
           description: error?.message,
         });

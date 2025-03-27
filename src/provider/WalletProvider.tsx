@@ -23,6 +23,7 @@ function SolanaWalletProvider({
   const [showModal, setShowModal] = useState(false);
   const defaultWalletContext = useWallet();
   const connection = new Connection(endpoint);
+
   return (
     <SolanaWalletContext.Provider
       value={{ ...defaultWalletContext, showModal, setShowModal, connection }}

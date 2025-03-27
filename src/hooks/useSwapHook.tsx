@@ -5,7 +5,12 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { Token } from "@/types/type";
-import { ADMIN_FEE_ACCOUNT, SOLANA_ADDRESS } from "@/utility/constant";
+import {
+  ADMIN_FEE_ACCOUNT,
+  PLATFORM_FEE_FIX_AMOUNT,
+  PLATFORM_FEE_PERCENT,
+  SOLANA_ADDRESS,
+} from "@/utility/constant";
 import { formatUnits, parseUnits } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useNetworkWallet from "./useNetworkWallet";
@@ -140,9 +145,6 @@ function useSwapHook() {
 
   async function signAndSendTransaction() {
     if (!connected || !signTransaction || !sendTransaction || !publicKey) {
-      // console.error(
-      //   "Wallet is not connected or does not support signing transactions"
-      // );
       return;
     }
     setIsSubmitting(true);
@@ -174,7 +176,7 @@ function useSwapHook() {
       }
 
       const amountSentAsFee = String(
-        (Number(swapQuote?.data?.swapUsdValue) * 0.004) /
+        (Number(swapQuote?.data?.swapUsdValue) * PLATFORM_FEE_PERCENT) /
           solanaPrice?.data?.prices[SOLANA_ADDRESS]
       );
 
@@ -188,7 +190,8 @@ function useSwapHook() {
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: feeWallet,
-          lamports: 1_00_00000 > amount ? 1_00_00000 : amount,
+          lamports:
+            PLATFORM_FEE_FIX_AMOUNT > amount ? PLATFORM_FEE_FIX_AMOUNT : amount,
         })
       );
 
